@@ -119,7 +119,7 @@ All wallet + chain-session state lives under `src/features/wallet/`:
 
 ### Styling
 
-Global stylesheets are aggregated through `src/assets/css/index.scss`, which `main.tsx` imports alongside `bootstrap-reboot.min.css`, `grid.scss`, and the react-tooltip bundle. The aggregator pulls in `fonts.css`, `spacing.css`, `style.css`, `responsive.css`, `custom.css`, `wallet.css`, and `specs.css` in cascade order, and also inlines the `.error-*` rules used by `ServerError` and the 404 page (originally in `error.scss`, inlined to silence Sass `@import` deprecation warnings). Component-specific SCSS is co-located with each component (e.g. `header.scss`, `hero.scss`, `proposal.scss`, `meterBar.scss`, `epochProgress.scss`, `diff.scss`, `unavailabilityBanner.scss`). Design tokens (breakpoints, weights, font-size scale, radii) live in `src/assets/css/_tokens.scss`; **colour lives in `src/assets/css/theme.css`** — see Theming below and are consumed via `@use '...tokens' as t;`.
+Global stylesheets are aggregated through `src/assets/css/index.scss`, which `main.tsx` imports alongside `bootstrap-reboot.min.css`, `grid.scss`, and the react-tooltip bundle. The aggregator pulls in `theme.css`, `fonts.css`, `spacing.css`, `style.css`, `responsive.css`, and `custom.css` in cascade order, and also inlines the `.error-*` rules used by `ServerError` and the 404 page (originally in `error.scss`, inlined to silence Sass `@import` deprecation warnings). Component-specific SCSS is co-located with each component (e.g. `header.scss`, `hero.scss`, `proposal.scss`, `meterBar.scss`, `epochProgress.scss`, `diff.scss`, `unavailabilityBanner.scss`). Design tokens (breakpoints, weights, font-size scale, radii) live in `src/assets/css/_tokens.scss` and are consumed via `@use '...tokens' as t;`; **colour lives in `src/assets/css/theme.css`** — see Theming below.
 
 Display type is different from body type and does not live in the `$text-*`
 scale. A title's size is a **ramp** across breakpoints, and a Sass variable
@@ -200,17 +200,18 @@ oklch lightness clamp (a floor on dark, a ceiling on light).
   sets `colorScheme: 'dark'` and theme-aware specs opt in. `a11y.spec.ts`
   scans every page state under both palettes (pinned through storage with
   `e2e/fixtures/theme.ts`, so the pre-paint script applies it on the first
-  frame) and asserts `data-theme` before each scan.
+  frame) and asserts `data-theme` before each route scan.
 - **Contrast over the art, re-measured.** The dark figure recorded above
   (6.04:1, `.page-header-sup` over the Flare symbol) still holds — re-sampling
-  that node gave 7.93:1 dark and 6.63:1 light, so the chain art was never the
-  binding constraint. The rune canvas is: the hero tagline over a fully-lit
-  glyph measured **3.19:1** in light at the inherited `opacity: 0.3`, so
-  `--hero-art-opacity` now carries that value per palette — dark keeps `0.3`,
-  light drops to `0.15`, which measures **4.74:1**. Re-run the sampler if
-  either art's opacity or the tagline colour changes.
+  `.page-header-sup` over the chain symbols gave 7.93:1 dark and 6.63:1 light,
+  so the chain art was never the binding constraint. The rune canvas is: the
+  hero tagline over a fully-lit glyph measured **3.19:1** in light at the
+  inherited `opacity: 0.3`, so `--hero-art-opacity` now carries that value per
+  palette — dark keeps `0.3`, light drops to `0.15`, which measures
+  **4.74:1**. Re-run the sampler if either art's opacity or the tagline
+  colour changes.
 - **A pre-existing dark-mode gap the sampling exposed.** The same hero tagline
-  over the same canvas measures **3.24:1 in dark**, and always has — 
+  over the same canvas measures **3.24:1 in dark**, and always has —
   `--main-color` (`#9f9f9f`) over the canvas's bright inside glyphs. It was
   never caught because axe cannot resolve a canvas background and headless
   Chromium here has no WebGL2, so the canvas renders nothing under test. It is
@@ -349,11 +350,12 @@ arbitrary style choices until you know what they are for.
 - **Contrast has been measured, not assumed.** axe reports `color-contrast` as
   *incomplete* on most routes because the chain background art, the hero rune
   canvas and the carousel mask defeat its background resolution. Sampling the
-  rendered pixels behind every one of those nodes put the worst case at
-  **6.04:1** (`.page-header-sup` over the Flare symbol), comfortably past the
-  4.5:1 AA threshold. Don't treat those incompletes as unknowns; do re-measure
-  if the background art gets brighter than `opacity: 0.30`. The light palette
-  has its own figure — see Theming.
+  rendered pixels put the worst case **over the chain art** at **6.04:1**
+  (`.page-header-sup` over the Flare symbol), comfortably past the 4.5:1 AA
+  threshold. The rune canvas was not genuinely rendered by that pass, and has
+  a known dark-mode gap — see Theming. Don't treat those incompletes as
+  unknowns; do re-measure if the background art gets brighter than
+  `opacity: 0.30`. The light palette has its own figure — see Theming.
 - **Two things pass only on a technicality, so tread carefully.** Hash links in
   the activity feed are 17px tall and clear 2.5.8 (WCAG 2.2) solely through the
   spacing exception, with 26px between centres against a 24px requirement —
