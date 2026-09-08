@@ -28,6 +28,7 @@ vi.mock('~/features/wallet/store', () => {
 })
 
 import Header from './header'
+import { useThemeStore } from '~/features/theme/store'
 
 // Wrap renders with MemoryRouter — the SUT calls useLocation + NavLink
 // and crashes without a routing context.
@@ -158,5 +159,41 @@ describe('Header — protocols submenu is a disclosure', () => {
     expect(toggle.getAttribute('aria-expanded')).toBe('false')
     const controls = toggle.getAttribute('aria-controls')!
     expect(document.getElementById(controls)).toBeTruthy()
+  })
+})
+
+// --- Theme toggle -----------------------------------------------------
+
+describe('Header — theme toggle', () => {
+  beforeEach(() => {
+    localStorage.clear()
+    useThemeStore.setState({ theme: 'dark', pinned: false })
+    document.documentElement.dataset.theme = 'dark'
+  })
+
+  it('renders one toggle in the desktop cluster and one in the mobile row, named for the action', () => {
+    renderHeader()
+    // The label is the *action*, not the state: "Switch to light theme" tells
+    // a screen-reader user what the button does without needing aria-pressed
+    // plus an icon plus a label all flipping for one bit.
+    expect(screen.getAllByRole('button', { name: 'Switch to light theme' })).toHaveLength(2)
+    expect(screen.queryByRole('button', { name: 'Switch to dark theme' })).toBeNull()
+  })
+
+  it('flips the theme, both labels and the document attribute on click', async () => {
+    const user = userEvent.setup()
+    renderHeader()
+    await user.click(screen.getAllByRole('button', { name: 'Switch to light theme' })[0]!)
+    expect(screen.getAllByRole('button', { name: 'Switch to dark theme' })).toHaveLength(2)
+    expect(document.documentElement.dataset.theme).toBe('light')
+    expect(useThemeStore.getState()).toMatchObject({ theme: 'light', pinned: true })
+  })
+
+  it('is a real button, not a link', () => {
+    renderHeader()
+    for (const b of screen.getAllByRole('button', { name: 'Switch to light theme' })) {
+      expect(b.tagName).toBe('BUTTON')
+      expect(b.getAttribute('type')).toBe('button')
+    }
   })
 })

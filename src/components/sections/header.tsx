@@ -5,6 +5,7 @@ import { menuList } from '../../utils/data/menu'
 import { useGlobalStore } from '~/features/wallet/store'
 import { Formatter } from '../../utils/misc/formatter'
 import './header.scss'
+import ThemeToggle from '~/features/theme/toggle'
 
 
 const ChooseWalletButton = () => {
@@ -88,6 +89,7 @@ const Header = () => {
                                         <li><Link target="_blank" rel="noopener noreferrer" to="https://x.com/stake_core" aria-label="X"><RiTwitterXLine size={18} /></Link></li>
                                         <li><Link target="_blank" rel="noopener noreferrer" to="https://t.me/+xZoChBQyyCo3OGY0" aria-label="Telegram"><RiSendPlaneLine size={18} /></Link></li>
                                         <li><Link target="_blank" rel="noopener noreferrer" to="https://github.com/stakecore" aria-label="GitHub"><RiGithubLine size={18} /></Link></li>
+                                        <li><ThemeToggle size={18} /></li>
                                     </ul>
                                     <button
                                         type="button"
@@ -154,6 +156,7 @@ const Header = () => {
                                 <li><Link target="_blank" rel="noopener noreferrer" to="https://t.me/+xZoChBQyyCo3OGY0" aria-label="Telegram"><RiSendPlaneLine size={16} /></Link></li>
                                 <li><Link target="_blank" rel="noopener noreferrer" to="https://github.com/stakecore" aria-label="GitHub"><RiGithubLine size={16} /></Link></li>
                             </ul>
+                            <ThemeToggle />
                             <ChooseWalletButton />
                         </div>
                     </div>

@@ -105,6 +105,28 @@
     }
 }
 
+// Theme toggle. The same 32px box as the social icons either side of it, so
+// it reads as one more item in the row (both rows: it renders in .mobile-social
+// and in .menu-btns, as the social links do). A <button>: the global reset
+// drops its border but not the UA background, which is cleared here.
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: none;
+    color: var(--main-color);
+    border-radius: t.$radius-sm;
+    cursor: pointer;
+    transition: color 150ms ease-out, background-color 150ms ease-out;
+
+    &:hover {
+        color: var(--heading-color);
+        background-color: var(--surface-hover);
+    }
+}
+
 .main-menu {
     width: 100%;
 
