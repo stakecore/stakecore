@@ -158,7 +158,12 @@
 
     // opacity 0.4 preserves the faint look the global input::placeholder rule
     // used to contribute (now removed from style.css).
-    &::placeholder { color: rgba(255, 255, 255, 0.3); opacity: 0.4; }
+    // Fallback then exact: 30% of the ink, at the literal's own alpha.
+    &::placeholder {
+        color: var(--text-dim);
+        color: color-mix(in srgb, var(--heading-color) 30%, transparent);
+        opacity: 0.4;
+    }
     &:focus { outline: none; }
     &:disabled {
         opacity: 0.6;
@@ -232,5 +237,7 @@
 }
 
 .fsp-delegate-preview-warn {
-    color: rgba(255, 165, 0, 0.9);
+    // Was rgba(255,165,0,.9) — a near-match to the warn token in dark, and
+    // the token has an AA light value where a mixed orange would not.
+    color: var(--status-warn);
 }

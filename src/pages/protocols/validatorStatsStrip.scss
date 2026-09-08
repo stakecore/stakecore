@@ -44,9 +44,9 @@
 // family as the EpochProgress fill above. Delegated drops opacity so
 // the two segments are still visually distinct without needing a
 // second colour. Available stays as the muted track underneath.
-.validator-capacity-segment.self      { background: var(--validator-bar-accent, rgba(255, 255, 255, 0.75)); }
+.validator-capacity-segment.self      { background: var(--validator-bar-accent, var(--heading-color)); }
 .validator-capacity-segment.delegated {
-    background: var(--validator-bar-accent, rgba(255, 255, 255, 0.35));
+    background: var(--validator-bar-accent, var(--text-dim));
     opacity: 0.45;
 }
 
@@ -59,9 +59,9 @@
     flex-shrink: 0;
 }
 
-.validator-capacity-dot.self      { background: var(--validator-bar-accent, rgba(255, 255, 255, 0.75)); }
+.validator-capacity-dot.self      { background: var(--validator-bar-accent, var(--heading-color)); }
 .validator-capacity-dot.delegated {
-    background: var(--validator-bar-accent, rgba(255, 255, 255, 0.35));
+    background: var(--validator-bar-accent, var(--text-dim));
     opacity: 0.45;
 }
 .validator-capacity-dot.available {

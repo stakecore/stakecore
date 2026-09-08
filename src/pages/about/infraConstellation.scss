@@ -26,7 +26,8 @@
 // --- Connection lines ---
 
 .infra-line {
-    stroke: rgba(255, 255, 255, 0.18);
+    stroke: var(--border);
+    stroke: color-mix(in srgb, var(--heading-color) 18%, transparent);
     stroke-width: 1;
     fill: none;
     // Dashes moving from server end (x1, y1) toward workload (x2, y2)

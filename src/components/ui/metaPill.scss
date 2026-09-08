@@ -29,7 +29,8 @@
 }
 
 .meta-pill-value {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--heading-color);
+    color: color-mix(in srgb, var(--heading-color) 90%, transparent);
     font-variant-numeric: tabular-nums;
     font-weight: t.$weight-semibold;
 }

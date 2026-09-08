@@ -143,7 +143,8 @@ $infra-gutter: 56px;   // between the two columns, at lg and up
 a.about-inline-link {
     color: var(--heading-color);
     text-decoration: underline;
-    text-decoration-color: rgba(255, 255, 255, 0.32);
+    text-decoration-color: var(--border-strong);
+    text-decoration-color: color-mix(in srgb, var(--heading-color) 32%, transparent);
     text-underline-offset: 0.18em;
     transition: text-decoration-color 150ms ease-out;
 }

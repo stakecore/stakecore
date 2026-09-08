@@ -9,8 +9,8 @@
     left: 0;
     right: 0;
     z-index: 50;
-    background: #1E090C;
-    border-top: 1px solid #6C222B;
+    background: var(--danger-surface);
+    border-top: 1px solid var(--danger-border);
     color: var(--heading-color);
     // Promote to its own GPU layer so iOS Safari / mobile Chrome don't
     // leave a visible gap below the banner while the URL bar animates
@@ -29,7 +29,7 @@
 
 .unavailability-banner-icon {
     flex-shrink: 0;
-    color: #d94357;
+    color: var(--status-bad);
 }
 
 .unavailability-banner-text strong {

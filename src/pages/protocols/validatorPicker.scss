@@ -98,7 +98,7 @@
     list-style: none;
     background: var(--body-background);
     border: 1px solid var(--border);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+    box-shadow: 0 12px 32px var(--shadow);
     z-index: 20;
     // Subtle pop-in so the menu doesn't appear out of nowhere.
     animation: validator-picker-menu-in 100ms ease-out;
@@ -133,7 +133,7 @@
     // row is currently active without colouring the whole row.
     &.active {
         background: var(--surface-hover);
-        box-shadow: inset 2px 0 0 var(--validator-picker-accent, rgba(255, 255, 255, 0.6));
+        box-shadow: inset 2px 0 0 var(--validator-picker-accent, var(--text-dim));
     }
 }
 

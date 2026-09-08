@@ -3,10 +3,8 @@
 // Hero — left-aligned, hairline-divided vertical stack.
 //
 // Mobile-first. Wordmark and stats scale up at md / lg.
-// Color tokens reference existing dark-page variables (--heading-color
-// for ink, --main-color for muted, rgba white for borders) because the
-// global page background is still dark in this phase. The full light
-// theme flip is a later phase.
+// Colour comes from the theme tokens (--heading-color for ink, --main-color
+// for muted, the --border-* alphas for rules); theme.css swaps the palette.
 
 .hero {
     position: relative;

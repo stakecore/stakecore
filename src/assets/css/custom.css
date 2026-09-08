@@ -44,7 +44,7 @@
   background-size: auto 400px;
   background-position: center;
   background-repeat: no-repeat;
-  opacity: 0.30;
+  opacity: var(--chain-art-opacity);
   z-index: -1;
   pointer-events: none;
 }

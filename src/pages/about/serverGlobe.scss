@@ -90,7 +90,8 @@
 // smaller than either node swatch, so the legend ranks the three layers the
 // way the picture does.
 .server-globe-legend-term--region::before {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--border-strong);
+    background: color-mix(in srgb, var(--heading-color) 30%, transparent);
     transform: scale(0.6);
 }
 

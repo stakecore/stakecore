@@ -112,28 +112,35 @@
 // Hover reveals the brand's own colour. --stack-brand is set inline per item
 // from the generated hex; items without a mark simply have no rule to apply.
 //
-// A raw brand hex will not do, because this page sits on #000 and several of
-// these marks are drawn for white backgrounds: GitHub is #181717, OVH
-// #123F6D, WireGuard #88171A. At full strength they are darker than the
-// muted rest colour, so "reveal" would read as the logo fading out.
+// A raw brand hex will not do, because on the dark palette this page sits on
+// #000 and several of these marks are drawn for white backgrounds: GitHub is
+// #181717, OVH #123F6D, WireGuard #88171A. At full strength they are darker
+// than the muted rest colour, so "reveal" would read as the logo fading out.
 //
 // A flat mix toward white does not solve it either — enough white to rescue
 // #181717 washes Nomad's #00CA8E into pastel. What is wanted is a floor on
 // lightness alone, leaving hue and chroma untouched, which is exactly what
 // relative colour syntax expresses. Bright marks pass through unchanged
 // because max() picks their own lightness.
-//
-// The mix below is the fallback for browsers without relative colour syntax
-// (pre-2024); it under-serves the darkest marks but never inverts them.
 .stack-item:hover .stack-item-glyph,
 .stack-carousel:focus-within .stack-item:hover .stack-item-glyph {
-    color: color-mix(in srgb, var(--stack-brand) 60%, #fff);
+    color: color-mix(in srgb, var(--stack-brand) 60%, var(--heading-color));
 }
 
+// The clamp is a token so the two palettes can disagree about its value; the
+// *direction* has to flip too, which a value cannot express — on a light page
+// the failure is the mirror image (Nomad's #00CA8E is too bright to read on
+// white), so light takes a ceiling where dark takes a floor. This is the one
+// place outside theme.css that branches on data-theme.
 @supports (color: oklch(from red l c h)) {
     .stack-item:hover .stack-item-glyph,
     .stack-carousel:focus-within .stack-item:hover .stack-item-glyph {
-        color: oklch(from var(--stack-brand) max(l, 0.78) c h);
+        color: oklch(from var(--stack-brand) max(l, var(--brand-lightness-clamp)) c h);
+    }
+
+    :root[data-theme="light"] .stack-item:hover .stack-item-glyph,
+    :root[data-theme="light"] .stack-carousel:focus-within .stack-item:hover .stack-item-glyph {
+        color: oklch(from var(--stack-brand) min(l, var(--brand-lightness-clamp)) c h);
     }
 }
 
