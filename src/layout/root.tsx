@@ -1,5 +1,6 @@
 import { Outlet, useLocation, useMatches, useNavigation } from 'react-router'
 import { useGlobalStore } from '~/features/wallet/store'
+import { useThemeStore } from '~/features/theme/store'
 import { useShallow } from 'zustand/react/shallow'
 import { onInternalChainSwitch } from '~/features/wallet/hook'
 import { chainFromRoute, chainToChainId } from '../utils/misc/translations'
@@ -75,6 +76,7 @@ const RootLayout = () => {
   const { setChain, setWallet, wallet } = useGlobalStore(
     useShallow(state => ({ setChain: state.setChain, setWallet: state.setWalletAddress, wallet: state.walletProvider }))
   )
+  const theme = useThemeStore(state => state.theme)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -143,8 +145,8 @@ const RootLayout = () => {
       </div>
       {deferredChrome && (
         <Suspense fallback={null}>
-          <Toasts theme='dark' position='top-left' />
-          <Tooltips id="tooltip" />
+          <Toasts theme={theme} position='top-left' />
+          <Tooltips id="tooltip" variant={theme} />
           <DiscoverWalletProviders />
         </Suspense>
       )}
