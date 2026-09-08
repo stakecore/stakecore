@@ -54,9 +54,11 @@
 
     /* Formula inputs, not colours. The carousel hover clamps a brand mark's
        oklch lightness to this (a floor on dark, a ceiling on light); the
-       chain symbol behind page headers renders at this opacity. */
+       chain symbol behind page headers renders at this opacity; the hero
+       rune canvas (hero.scss .hero-rune-canvas) renders at this one. */
     --brand-lightness-clamp: 0.78;
     --chain-art-opacity: 0.30;
+    --hero-art-opacity: 0.3;
 }
 
 :root[data-theme="light"] {
@@ -90,4 +92,5 @@
 
     --brand-lightness-clamp: 0.55;
     --chain-art-opacity: 0.30;
+    --hero-art-opacity: 0.15;   /* pixel-sampled: .hero-tagline over the rune canvas, 4.74:1 */
 }
