@@ -1,6 +1,6 @@
 import { Outlet, useLocation, useMatches, useNavigation } from 'react-router'
 import { useGlobalStore } from '~/features/wallet/store'
-import { useThemeStore } from '~/features/theme/store'
+import { applyThemeToDocument, useThemeStore } from '~/features/theme/store'
 import { useShallow } from 'zustand/react/shallow'
 import { onInternalChainSwitch } from '~/features/wallet/hook'
 import { chainFromRoute, chainToChainId } from '../utils/misc/translations'
@@ -87,6 +87,15 @@ const RootLayout = () => {
   useEffect(() => {
     if (routeTitle) document.title = routeTitle
   }, [routeTitle])
+
+  // The pre-paint script in index.html normally does this before React exists,
+  // and the store stamps every later change synchronously. This is the repair
+  // path for the case where that script did not run at all (a CSP, an
+  // extension): without it the document and the store would disagree, and the
+  // first toggle click would appear to do nothing.
+  useEffect(() => {
+    applyThemeToDocument(theme)
+  }, [theme])
 
   useEffect(() => {
     setChain(chainId)

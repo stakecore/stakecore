@@ -16,8 +16,6 @@
  * their ratio; re-measure if you change one. --border-* / --surface-* mirror
  * the dark alphas exactly — tune by eye against the rendered page, not here
  * in the abstract.
- *
- * No `}` inside comments: theme.test.ts slices blocks on the first one.
  */
 
 :root {

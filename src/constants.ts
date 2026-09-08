@@ -46,7 +46,11 @@ export const avalancheDelegatorMaxLockup = 31536000
 
 // style
 // Spinner ink. Every consumer is a spinners-react <SpinnerCircular color>,
-// which lands on the <svg> as a presentation attribute and resolves var().
+// which spreads `color` onto the <svg> as the CSS `color` property (not a
+// presentation attribute) and strokes with currentColor. `color` is
+// inherited, so if var() ever failed to resolve here the spinner would just
+// inherit the page's text colour and stay visible — unlike the chart's
+// `stroke` attribute, which falls back to `none` on the same failure.
 export const PAGE_COLOR_CODE = 'var(--heading-color)'
 
 

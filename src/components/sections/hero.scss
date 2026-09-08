@@ -36,7 +36,7 @@
     pointer-events: none;
     z-index: -1;
     // Fade the lower half toward the page background so the wave
-    // dissolves into the dark body instead of cutting off at the
+    // dissolves into the page background instead of cutting off at the
     // hero's overflow edge.
     mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);
     -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 25%, black 75%, transparent 100%);

@@ -36,6 +36,16 @@ describe('theme.css', () => {
     expect(d).toContain('--main-color: #9f9f9f')
     expect(d).toContain('--heading-color: #fff')
     expect(d).toContain('--body-background: #000')
+    expect(d).toContain('--border-emphasis: rgba(255, 255, 255, 0.45)')
+    expect(d).toContain('--border-strong: rgba(255, 255, 255, 0.25)')
+    // toContain, not a stricter match — "--border:" is also a prefix of
+    // "--border-emphasis:" etc., so this needs the value alongside the name
+    // to disambiguate from its longer siblings.
+    expect(d).toContain('--border: rgba(255, 255, 255, 0.1)')
+    expect(d).toContain('--border-subtle: rgba(255, 255, 255, 0.08)')
+    expect(d).toContain('--border-faint: rgba(255, 255, 255, 0.06)')
+    expect(d).toContain('--surface-hover: rgba(255, 255, 255, 0.04)')
+    expect(d).toContain('--surface-raised: rgba(255, 255, 255, 0.02)')
     expect(d).toContain('--surface-menu: #1F1F1F')
     expect(d).toContain('--text-dim: rgba(255, 255, 255, 0.55)')
     expect(d).toContain('--danger: #ff3e55')

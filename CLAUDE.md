@@ -188,14 +188,25 @@ oklch lightness clamp (a floor on dark, a ceiling on light).
   click pins a choice (`pinned`), and a later OS change is ignored. Its
   accessible name is the action ("Switch to light theme"), not the state, and
   it carries no `aria-pressed`.
-- **Dark is pixel-identical to before the change.** Every dark token is the
-  literal it replaced. Where a stylesheet needed an alpha no token carries,
-  it uses `color-mix(in srgb, var(--heading-color) N%, transparent)` with a
-  token fallback declared first. Don't "tidy" those into the nearest token.
-- **`var(--…)` works inside SVG presentation attributes** (`stroke`, `fill`,
-  `color`) — verified in Chromium — which is why recharts and spinners-react
-  take token strings straight in their props and there is no chart
-  stylesheet.
+- **Dark is perceptually identical to before the change.** Every dark token
+  is the literal it replaced. Where a stylesheet needed an alpha no token
+  carries, it uses `color-mix(in srgb, var(--heading-color) N%, transparent)`
+  with a token fallback declared first. Don't "tidy" those into the nearest
+  token. Verified with a one-off full-page screenshot pass over all eight
+  routes at 2% tolerance against a pre-change build; the spec was deleted
+  afterwards, so that pass is not a standing gate — the pinned literals in
+  `theme.test.ts` are what CI actually checks going forward.
+- **`var(--…)` resolving inside SVG presentation attributes** (`stroke`,
+  `fill`, `color`) was verified in Chromium, but only Chromium is installed
+  here, so nothing depends on it where the failure mode is invisible content.
+  `statsChart.scss` targets recharts' own class names
+  (`.recharts-line-curve`, `.recharts-line-dot`,
+  `.recharts-cartesian-axis-tick-value`) instead of passing colours through
+  `<Line>` / `<XAxis>` props, and `diff.tsx`'s arrow icon takes
+  `fill="currentColor"` rather than the token directly. Where the value lands
+  in an inline style or a custom property instead — spinners-react's `color`
+  prop, the chart tooltip's `contentStyle` / `labelStyle` / `itemStyle` —
+  `var()` is universally safe and stays a prop.
 - **Playwright emulates a light OS by default**, so `playwright.config.ts`
   sets `colorScheme: 'dark'` and theme-aware specs opt in. `a11y.spec.ts`
   scans every page state under both palettes (pinned through storage with
@@ -226,9 +237,9 @@ oklch lightness clamp (a floor on dark, a ceiling on light).
   trusting the result.
 - Left as they are, deliberately: the five dark-canvas illustrations
   (protocol thumbnails, the news visualiser) and the chain symbols — dark
-  cards on a light page, revisit after living with it; `.notification-block`'s
-  named-colour borders and the `FireBrick` bar fills, which read on both
-  grounds and whose token neighbours differ in value.
+  cards on a light page, revisit after living with it; the `FireBrick` bar
+  fills, which read on both grounds and whose token neighbours differ in
+  value.
 
 ### Agent readability
 

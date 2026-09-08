@@ -269,6 +269,10 @@ function draw(
   drawRegions(ctx, cx, cy, radius, centreLon, centreLat, false, clientColor)
   drawNodes(ctx, cx, cy, radius, centreLon, centreLat, false, serverColor, clientColor)
 
+  // Neither drawRegions nor drawNodes touches strokeStyle today, so this
+  // re-set is currently redundant with the one above — it guards against a
+  // future edit to either function changing strokeStyle (e.g. to draw node
+  // outlines in serverColor) and silently bleeding into the strokes below.
   ctx.strokeStyle = clientColor
   ctx.globalAlpha = 0.08
   strokeLines(ctx, GRATICULE_LINES, cx, cy, radius, centreLon, centreLat, true)

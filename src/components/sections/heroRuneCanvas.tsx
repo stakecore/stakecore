@@ -5,8 +5,9 @@ import { useThemeStore } from '~/features/theme/store'
 
 // GPU implementation of the ASCII-wave hero background. A single
 // full-screen fragment shader picks an ASCII glyph per pixel from a
-// pre-rasterized glyph atlas based on (distance, phase) and tints it
-// white inside the StakeCore rune silhouette / gray outside.
+// pre-rasterized glyph atlas based on (distance, phase) and emits the
+// theme's ink colour at full alpha inside the StakeCore rune silhouette,
+// dimmed alpha outside.
 //
 // Per-frame main-thread work reduces to: update one `u_phase` uniform
 // + drawArrays(6). All shading happens on the GPU in parallel.
@@ -83,8 +84,11 @@ void main() {
   fragColor = vec4(u_ink * a, a);
 }`
 
-// Any CSS colour → linear-ish 0..1 RGB, via the 2D canvas parser so the token
-// may be hex, rgb() or a named colour without a parser of our own.
+// Any CSS colour → sRGB byte values divided by 255, into 0..1 RGB, via the 2D
+// canvas parser so the token may be hex, rgb() or a named colour without a
+// parser of our own. No gamma decode — that is correct for this shader, which
+// composites in the same (non-linear) space; don't "fix" this later by adding
+// one.
 const parseCssColor = (color: string): [number, number, number] => {
   const off = document.createElement('canvas')
   off.width = 1
@@ -183,8 +187,9 @@ const HeroRuneCanvas = () => {
     applyInk()
 
     // --- glyph atlas: a 1-row horizontal strip of all RAMP chars
-    // rendered in white. The fragment shader multiplies by per-cell
-    // color, so we only need one color baked into the atlas.
+    // rendered in white. The fragment shader reads only the atlas's alpha
+    // channel (see fragColor above) and tints with u_ink, so the colour
+    // baked into the atlas is irrelevant — it could be any colour.
     const buildGlyphAtlas = (): HTMLCanvasElement => {
       const charW = Math.ceil(cellSizePx)
       const charH = Math.ceil(cellSizePx)
