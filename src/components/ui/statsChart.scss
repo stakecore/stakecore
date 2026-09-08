@@ -1,0 +1,35 @@
+// Colour for the recharts line chart's series stroke, dot fill/stroke and
+// axis tick fill — targeting recharts' own class names rather than passing
+// these as component props. `stroke` and `fill` are SVG *presentation
+// attributes*, and only Chromium is installed in this repo to check whether
+// var() resolves inside one; if it doesn't, the failure mode is hard
+// (stroke falls back to `none`, fill to `black` — invisible lines on a
+// black page). A stylesheet rule beats a presentation attribute in every
+// browser, which sidesteps the question entirely.
+//
+// recharts renders one <g class="recharts-line"> per series, in the order
+// the <Line> elements are given — first series is the primary ink, every
+// later one (none of today's charts pass more than one key, but the
+// component supports it) falls back to the dimmer token.
+
+.recharts-cartesian-axis-tick-value {
+    fill: var(--text-dim);
+}
+
+.recharts-line:first-of-type .recharts-line-curve {
+    stroke: var(--heading-color);
+}
+
+.recharts-line:not(:first-of-type) .recharts-line-curve {
+    stroke: var(--text-dim);
+}
+
+.recharts-line:first-of-type .recharts-line-dot {
+    stroke: var(--heading-color);
+    fill: var(--body-background);
+}
+
+.recharts-line:not(:first-of-type) .recharts-line-dot {
+    stroke: var(--text-dim);
+    fill: var(--body-background);
+}

@@ -12,6 +12,21 @@
     font-size: inherit;
 }
 
+// Tinted background at 12% of the same token the text/arrow use. An inline
+// style can't carry a fallback-then-color-mix pair (the second of two
+// identical properties always wins), so this lives here instead of in
+// diff.tsx: fallback token first, in case color-mix() is unsupported (~7%
+// of browsers), then the actual mixed value.
+.diff-pill.positive {
+    background-color: var(--diff-positive);
+    background-color: color-mix(in srgb, var(--diff-positive) 12%, transparent);
+}
+
+.diff-pill.negative {
+    background-color: var(--diff-negative);
+    background-color: color-mix(in srgb, var(--diff-negative) 12%, transparent);
+}
+
 .diff-text { margin-left: 5px; }
 
 .diff-pill .diff-text { margin-left: 0; }

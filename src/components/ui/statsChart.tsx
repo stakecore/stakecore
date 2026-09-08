@@ -1,13 +1,18 @@
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from "recharts"
+import './statsChart.scss'
 
 
 const chartMargin = { top: 20, right: 20, bottom: 5, left: 20 }
 
-// Theme tokens, passed straight through: recharts writes these as SVG
-// presentation attributes and inline styles, both of which resolve var().
+// Theme tokens for the parts recharts renders as inline styles — var()
+// resolves fine there. The series stroke, dot fill/stroke and axis tick fill
+// are presentation *attributes* instead, where a failed var() resolution is
+// a hard failure (stroke -> none, fill -> black: invisible lines on a black
+// page), and only Chromium is installed here to check that it doesn't fail.
+// Those live in statsChart.scss as stylesheet rules instead, which resolve
+// var() the same in every browser.
 const INK = 'var(--heading-color)'
 const INK_DIM = 'var(--text-dim)'
-const GROUND = 'var(--body-background)'
 const TOOLTIP = { background: 'var(--surface-menu)', border: '1px solid var(--border)', borderRadius: 8 }
 
 // Generic reward-epoch line chart shared by the FSP and validator statistics
@@ -33,7 +38,10 @@ const StatsChart = ({ data, keys, formatY, height = 200 }: {
       // programmatically associated with it.
       aria-label={`Line chart of ${keys.join(' and ')}. Interactive: use arrow keys to move through data points.`}
     >
-      <XAxis dataKey="x" tick={{ fill: INK_DIM, fontSize: 12 }} tickLine={false} axisLine={false} />
+      {/* fill left to statsChart.scss's .recharts-cartesian-axis-tick-value
+          rule — a stylesheet rule beats a presentation attribute, so setting
+          it here would be dead weight at best. */}
+      <XAxis dataKey="x" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
       <YAxis hide domain={['auto', 'auto']} />
       <Tooltip
         contentStyle={TOOLTIP}
@@ -41,14 +49,17 @@ const StatsChart = ({ data, keys, formatY, height = 200 }: {
         itemStyle={{ color: INK }}
         formatter={(v: number) => formatY(v)}
       />
-      {keys.map((key, i) => (
+      {/* stroke and dot fill/stroke left to statsChart.scss's
+          .recharts-line rules, targeting the first series vs. the rest by
+          DOM order (recharts renders one <g class="recharts-line"> per
+          series, in prop order). */}
+      {keys.map(key => (
         <Line
           key={key}
           type="monotone"
           dataKey={key}
-          stroke={i === 0 ? INK : INK_DIM}
           strokeWidth={2}
-          dot={{ fill: GROUND, stroke: i === 0 ? INK : INK_DIM, strokeWidth: 2, r: 4 }}
+          dot={{ strokeWidth: 2, r: 4 }}
           activeDot={{ r: 6 }}
           name={key}
         />
