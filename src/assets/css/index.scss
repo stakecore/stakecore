@@ -8,6 +8,8 @@
 // them into one bundle at build time. CSS @imports must precede any
 // other CSS rule, which is why the inlined .error-* rules below come
 // after all the @imports.
+// Colour palettes first: everything after this reads var(--…) from them.
+@import 'theme.css';
 @import 'fonts.css';
 @import 'spacing.css';
 @import 'style.css';

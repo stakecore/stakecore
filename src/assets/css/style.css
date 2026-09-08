@@ -2,7 +2,7 @@
  * Global base styles for StakeCore.
  *
  * Sections:
- *   01. Tokens (CSS custom properties; mirror _tokens.scss)
+ *   01. Tokens (CSS custom properties; mirror _tokens.scss — colour lives in theme.css)
  *   02. Reset + element defaults
  *   03. Typography defaults (h1-h6, p, a)
  *   04. Form primitives (.form-control, label, form-group)
@@ -11,30 +11,11 @@
  *   07. Preloader
  */
 
-/* ---- 01. Tokens ---- */
+/* ---- 01. Tokens ----
+   Colour is NOT here: theme.css owns both palettes and is imported ahead of
+   this file by index.scss. This block is the non-colour scale only. */
 
 :root {
-    --main-color: #9f9f9f;
-    --heading-color: #fff;
-    --body-background: #000;
-
-    /* Surface + border system — the white-on-black overlays that make up the
-       card look. Centralised so the dominant shades live in one place (values
-       unchanged from the literals they replaced). */
-    --border-emphasis: rgba(255, 255, 255, 0.45);  /* strongest hover/focus border */
-    --border-strong: rgba(255, 255, 255, 0.25);    /* emphasized / hover border */
-    --border: rgba(255, 255, 255, 0.1);            /* medium hairline / divider */
-    --border-subtle: rgba(255, 255, 255, 0.08);   /* card / hairline border */
-    --border-faint: rgba(255, 255, 255, 0.06);     /* fainter divider */
-    --surface-hover: rgba(255, 255, 255, 0.04);    /* hover fill */
-    --surface-raised: rgba(255, 255, 255, 0.02);   /* faint raised fill */
-    --surface-menu: #1F1F1F;                       /* header dropdown / drawer panel */
-    --text-dim: rgba(255, 255, 255, 0.55);         /* dimmed foreground text (clears AA) */
-
-    /* Status colours (values unchanged from the duplicated literals). */
-    --danger: #ff3e55;
-    --success: #7fb88f;
-
     /* Spacing scale (10px grid; mirrors $space-* in _tokens.scss) */
     --space-0: 0;
     --space-1: 5px;

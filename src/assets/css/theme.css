@@ -1,0 +1,93 @@
+/*
+ * Color tokens. The only file that knows what a theme looks like.
+ *
+ * Two palettes over one set of names: `:root` is dark, the brand default and
+ * what a visitor with JavaScript off gets; `:root[data-theme="light"]` wins
+ * when index.html's pre-paint script (or the theme store after it) stamps the
+ * attribute. Nothing else in the codebase may branch on data-theme except
+ * where a *formula* has to flip, not a value — today only the stack
+ * carousel's lightness clamp (stackCarousel.scss).
+ *
+ * Every dark value here is the literal it replaced. That is the whole
+ * contract of the light-mode change: dark is not being redesigned, and
+ * theme.test.ts pins the values that moved out of style.css.
+ *
+ * Light values were chosen for WCAG AA against #fff and are recorded with
+ * their ratio; re-measure if you change one. --border-* / --surface-* mirror
+ * the dark alphas exactly — tune by eye against the rendered page, not here
+ * in the abstract.
+ *
+ * No `}` inside comments: theme.test.ts slices blocks on the first one.
+ */
+
+:root {
+    color-scheme: dark;
+
+    --main-color: #9f9f9f;        /* body / muted text (7.9:1) */
+    --heading-color: #fff;        /* ink: headings, focus ring, chart primary */
+    --body-background: #000;
+
+    /* Surface + border system — white-on-black overlays that make up the
+       card look. Alphas are what the literals were. */
+    --border-emphasis: rgba(255, 255, 255, 0.45);  /* strongest hover/focus border */
+    --border-strong: rgba(255, 255, 255, 0.25);    /* emphasized / hover border */
+    --border: rgba(255, 255, 255, 0.1);            /* medium hairline / divider */
+    --border-subtle: rgba(255, 255, 255, 0.08);    /* card / hairline border */
+    --border-faint: rgba(255, 255, 255, 0.06);     /* fainter divider */
+    --surface-hover: rgba(255, 255, 255, 0.04);    /* hover fill */
+    --surface-raised: rgba(255, 255, 255, 0.02);   /* faint raised fill */
+    --surface-menu: #1F1F1F;                       /* header dropdown / drawer / chart tooltip */
+    --surface-card: #0F0F0F;                       /* wallet picker card */
+    --text-dim: rgba(255, 255, 255, 0.55);         /* dimmed foreground text (6.3:1) */
+    --shadow: rgba(0, 0, 0, 0.45);                 /* validator picker drop shadow */
+
+    /* Status colours. */
+    --danger: #ff3e55;
+    --danger-surface: #1E090C;                     /* unavailability banner band */
+    --danger-border: #6C222B;                      /* its top rule */
+    --success: #7fb88f;
+    --status-bad: #d94357;                         /* meter label, banner icon */
+    --status-warn: #e58630;                        /* meter label, delegate warning */
+    --status-good: #76B768;                        /* meter label, round-progress fill */
+    --diff-positive: #50e3c2;                      /* percent-change pill */
+    --diff-negative: #ff3e55;
+
+    /* Formula inputs, not colours. The carousel hover clamps a brand mark's
+       oklch lightness to this (a floor on dark, a ceiling on light); the
+       chain symbol behind page headers renders at this opacity. */
+    --brand-lightness-clamp: 0.78;
+    --chain-art-opacity: 0.30;
+}
+
+:root[data-theme="light"] {
+    color-scheme: light;
+
+    --main-color: #5c5c5c;        /* 6.7:1 */
+    --heading-color: #000;
+    --body-background: #fff;
+
+    --border-emphasis: rgba(0, 0, 0, 0.45);
+    --border-strong: rgba(0, 0, 0, 0.25);
+    --border: rgba(0, 0, 0, 0.1);
+    --border-subtle: rgba(0, 0, 0, 0.08);
+    --border-faint: rgba(0, 0, 0, 0.06);
+    --surface-hover: rgba(0, 0, 0, 0.04);
+    --surface-raised: rgba(0, 0, 0, 0.02);
+    --surface-menu: #f2f2f2;
+    --surface-card: #fff;
+    --text-dim: rgba(0, 0, 0, 0.6);  /* 5.7:1 */
+    --shadow: rgba(0, 0, 0, 0.15);
+
+    --danger: #c8102e;               /* 5.9:1 */
+    --danger-surface: #fdecee;
+    --danger-border: #f3b4bc;
+    --success: #2f7d4a;              /* 5.1:1 */
+    --status-bad: #b42839;           /* 6.4:1 */
+    --status-warn: #a35a00;          /* 5.2:1 */
+    --status-good: #3a7d3c;          /* 5.0:1 */
+    --diff-positive: #0f766e;        /* 5.5:1 */
+    --diff-negative: #c8102e;        /* 5.9:1 */
+
+    --brand-lightness-clamp: 0.55;
+    --chain-art-opacity: 0.30;
+}
