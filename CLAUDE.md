@@ -119,7 +119,7 @@ All wallet + chain-session state lives under `src/features/wallet/`:
 
 ### Styling
 
-Global stylesheets are aggregated through `src/assets/css/index.scss`, which `main.tsx` imports alongside `bootstrap-reboot.min.css`, `grid.scss`, and the react-tooltip bundle. The aggregator pulls in `fonts.css`, `spacing.css`, `style.css`, `responsive.css`, `custom.css`, `wallet.css`, and `specs.css` in cascade order, and also inlines the `.error-*` rules used by `ServerError` and the 404 page (originally in `error.scss`, inlined to silence Sass `@import` deprecation warnings). Component-specific SCSS is co-located with each component (e.g. `header.scss`, `hero.scss`, `proposal.scss`, `meterBar.scss`, `epochProgress.scss`, `diff.scss`, `unavailabilityBanner.scss`). Design tokens (breakpoints, weights, font-size scale, radii, z-index scale, colors) live in `src/assets/css/_tokens.scss` and are consumed via `@use '...tokens' as t;`.
+Global stylesheets are aggregated through `src/assets/css/index.scss`, which `main.tsx` imports alongside `bootstrap-reboot.min.css`, `grid.scss`, and the react-tooltip bundle. The aggregator pulls in `fonts.css`, `spacing.css`, `style.css`, `responsive.css`, `custom.css`, `wallet.css`, and `specs.css` in cascade order, and also inlines the `.error-*` rules used by `ServerError` and the 404 page (originally in `error.scss`, inlined to silence Sass `@import` deprecation warnings). Component-specific SCSS is co-located with each component (e.g. `header.scss`, `hero.scss`, `proposal.scss`, `meterBar.scss`, `epochProgress.scss`, `diff.scss`, `unavailabilityBanner.scss`). Design tokens (breakpoints, weights, font-size scale, radii) live in `src/assets/css/_tokens.scss`; **colour lives in `src/assets/css/theme.css`** — see Theming below and are consumed via `@use '...tokens' as t;`.
 
 Display type is different from body type and does not live in the `$text-*`
 scale. A title's size is a **ramp** across breakpoints, and a Sass variable
@@ -160,6 +160,74 @@ exactly.
 Layout uses a 12-column grid, but **not** Bootstrap's — `src/assets/css/grid.scss` reimplements the containers, rows, columns, and the five utility classes the app actually uses (`d-flex`, `align-items-center`, `justify-content-center`, `mx-auto`, `mb-0`). Semantics match Bootstrap 5 exactly, including the `--bs-gutter-x` / `--bs-gutter-y` custom properties that `responsive.css` overrides. `bootstrap-grid.min.css` was 51.8 kB of render-blocking CSS for ~13 class usages. Only `bootstrap-reboot.min.css` remains third-party. If you reach for a Bootstrap class that isn't in `grid.scss`, add it there rather than pulling the framework back in.
 
 Fonts are **self-hosted** in `public/fonts/` (latin subsets; Inter and Roboto Mono are variable). `src/assets/css/fonts.css` holds the `@font-face` rules and `index.html` preloads Inter + Major Mono Display. They were on fonts.googleapis.com, which was render-blocking on a cold third-party origin and sat in front of the font files themselves. Two details are load-bearing: the metric-matched `'Inter Fallback'` face (second in every sans stack) keeps text from re-wrapping when the real Inter arrives, and Major Mono Display uses `font-display: optional` so a late arrival can't shift the header. Font URLs are literal and unhashed — that's why the files live in `public/`, not `src/assets/`.
+
+### Theming
+
+Two palettes, one set of token names, selected by `data-theme` on `<html>`.
+`src/assets/css/theme.css` is the only file that knows what a theme looks
+like: `:root` is dark (the brand default and what JavaScript-off gets),
+`:root[data-theme="light"]` overrides it. `theme.test.ts` asserts the two
+blocks declare the same names and pins the dark values that moved out of
+`style.css`. Nothing else may branch on `data-theme` except where a
+*formula* has to flip rather than a value — today only the stack carousel's
+oklch lightness clamp (a floor on dark, a ceiling on light).
+
+- **Resolution order is stored choice → `prefers-color-scheme` → dark**, and
+  it is implemented twice on purpose: once in the inline pre-paint script in
+  `index.html` (it has to run before any module loads, or the first frame is
+  the wrong palette) and once in `src/features/theme/store.ts`.
+  `prepaint.test.ts` executes the script out of the HTML against happy-dom to
+  keep the two in step. The script is the one sanctioned touch of
+  `localStorage` outside `safeStorage.ts`.
+- **The store writes the document, synchronously, before it notifies.** The
+  rune canvas and the globe re-read the palette with `getComputedStyle`
+  inside a store subscription; a React effect would stamp the attribute one
+  commit too late and they would repaint in the outgoing theme's colours.
+  There is a test for that ordering.
+- **The toggle is two-state with no way back to "follow the OS".** The first
+  click pins a choice (`pinned`), and a later OS change is ignored. Its
+  accessible name is the action ("Switch to light theme"), not the state, and
+  it carries no `aria-pressed`.
+- **Dark is pixel-identical to before the change.** Every dark token is the
+  literal it replaced. Where a stylesheet needed an alpha no token carries,
+  it uses `color-mix(in srgb, var(--heading-color) N%, transparent)` with a
+  token fallback declared first. Don't "tidy" those into the nearest token.
+- **`var(--…)` works inside SVG presentation attributes** (`stroke`, `fill`,
+  `color`) — verified in Chromium — which is why recharts and spinners-react
+  take token strings straight in their props and there is no chart
+  stylesheet.
+- **Playwright emulates a light OS by default**, so `playwright.config.ts`
+  sets `colorScheme: 'dark'` and theme-aware specs opt in. `a11y.spec.ts`
+  scans every page state under both palettes (pinned through storage with
+  `e2e/fixtures/theme.ts`, so the pre-paint script applies it on the first
+  frame) and asserts `data-theme` before each scan.
+- **Contrast over the art, re-measured.** The dark figure recorded above
+  (6.04:1, `.page-header-sup` over the Flare symbol) still holds — re-sampling
+  that node gave 7.93:1 dark and 6.63:1 light, so the chain art was never the
+  binding constraint. The rune canvas is: the hero tagline over a fully-lit
+  glyph measured **3.19:1** in light at the inherited `opacity: 0.3`, so
+  `--hero-art-opacity` now carries that value per palette — dark keeps `0.3`,
+  light drops to `0.15`, which measures **4.74:1**. Re-run the sampler if
+  either art's opacity or the tagline colour changes.
+- **A pre-existing dark-mode gap the sampling exposed.** The same hero tagline
+  over the same canvas measures **3.24:1 in dark**, and always has — 
+  `--main-color` (`#9f9f9f`) over the canvas's bright inside glyphs. It was
+  never caught because axe cannot resolve a canvas background and headless
+  Chromium here has no WebGL2, so the canvas renders nothing under test. It is
+  untouched by this branch (dark values are pinned) and wants its own fix:
+  either a darker rune inside-glyph alpha or a brighter tagline.
+- **Screenshot and contrast checks of the hero need a real GPU path.** Plain
+  headless Chromium in this devcontainer has no WebGL2, so the rune canvas
+  renders nothing and a screenshot gate over it passes identically for a
+  working and a broken change. Run those under `xvfb-run -a` with
+  `headless: false` (SwiftShader), and assert
+  `document.createElement('canvas').getContext('webgl2')` is truthy before
+  trusting the result.
+- Left as they are, deliberately: the five dark-canvas illustrations
+  (protocol thumbnails, the news visualiser) and the chain symbols — dark
+  cards on a light page, revisit after living with it; `.notification-block`'s
+  named-colour borders and the `FireBrick` bar fills, which read on both
+  grounds and whose token neighbours differ in value.
 
 ### Agent readability
 
@@ -284,7 +352,8 @@ arbitrary style choices until you know what they are for.
   rendered pixels behind every one of those nodes put the worst case at
   **6.04:1** (`.page-header-sup` over the Flare symbol), comfortably past the
   4.5:1 AA threshold. Don't treat those incompletes as unknowns; do re-measure
-  if the background art gets brighter than `opacity: 0.30`.
+  if the background art gets brighter than `opacity: 0.30`. The light palette
+  has its own figure — see Theming.
 - **Two things pass only on a technicality, so tread carefully.** Hash links in
   the activity feed are 17px tall and clear 2.5.8 (WCAG 2.2) solely through the
   spacing exception, with 26px between centres against a 24px requirement —
