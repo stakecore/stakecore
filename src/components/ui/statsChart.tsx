@@ -3,6 +3,13 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip } from "rec
 
 const chartMargin = { top: 20, right: 20, bottom: 5, left: 20 }
 
+// Theme tokens, passed straight through: recharts writes these as SVG
+// presentation attributes and inline styles, both of which resolve var().
+const INK = 'var(--heading-color)'
+const INK_DIM = 'var(--text-dim)'
+const GROUND = 'var(--body-background)'
+const TOOLTIP = { background: 'var(--surface-menu)', border: '1px solid var(--border)', borderRadius: 8 }
+
 // Generic reward-epoch line chart shared by the FSP and validator statistics
 // sections. Each `data` row is `{ x: <epoch>, [seriesName]: value }` with one
 // entry in `keys` per series to draw. This module pulls in recharts (+d3),
@@ -26,12 +33,12 @@ const StatsChart = ({ data, keys, formatY, height = 200 }: {
       // programmatically associated with it.
       aria-label={`Line chart of ${keys.join(' and ')}. Interactive: use arrow keys to move through data points.`}
     >
-      <XAxis dataKey="x" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 12 }} tickLine={false} axisLine={false} />
+      <XAxis dataKey="x" tick={{ fill: INK_DIM, fontSize: 12 }} tickLine={false} axisLine={false} />
       <YAxis hide domain={['auto', 'auto']} />
       <Tooltip
-        contentStyle={{ background: '#1a1a1a', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }}
-        labelStyle={{ color: 'rgba(255,255,255,0.6)' }}
-        itemStyle={{ color: 'white' }}
+        contentStyle={TOOLTIP}
+        labelStyle={{ color: INK_DIM }}
+        itemStyle={{ color: INK }}
         formatter={(v: number) => formatY(v)}
       />
       {keys.map((key, i) => (
@@ -39,9 +46,9 @@ const StatsChart = ({ data, keys, formatY, height = 200 }: {
           key={key}
           type="monotone"
           dataKey={key}
-          stroke={i === 0 ? 'white' : 'rgba(255,255,255,0.5)'}
+          stroke={i === 0 ? INK : INK_DIM}
           strokeWidth={2}
-          dot={{ fill: 'black', stroke: i === 0 ? 'white' : 'rgba(255,255,255,0.5)', strokeWidth: 2, r: 4 }}
+          dot={{ fill: GROUND, stroke: i === 0 ? INK : INK_DIM, strokeWidth: 2, r: 4 }}
           activeDot={{ r: 6 }}
           name={key}
         />

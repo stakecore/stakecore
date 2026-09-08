@@ -20,7 +20,7 @@ type Stats = {
 // Available, then a row of MetaPill legend entries. `accentColor` is
 // the same value passed to <EpochProgress> on this card so the two
 // progress visualisations share a colour family.
-const ValidatorStatsStrip = ({ stats, accentColor = 'white' }: {
+const ValidatorStatsStrip = ({ stats, accentColor = 'var(--heading-color)' }: {
   stats: Stats
   accentColor?: string
 }) => {

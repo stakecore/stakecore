@@ -79,7 +79,7 @@ const FspStatsComponent = ({ stats, chain }: { stats: FspStatisticsDto, chain: C
           <EpochProgress period={epochPeriod} color="FireBrick" />
         </div>
         <div className="col-lg-6">
-          <EpochProgress period={roundPeriod} color="#76B768" />
+          <EpochProgress period={roundPeriod} color="var(--status-good)" />
         </div>
       </div>
       <p>

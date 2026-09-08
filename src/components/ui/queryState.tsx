@@ -40,7 +40,7 @@ export function QueryState<T>({
   isLoading,
   error,
   data,
-  spinnerColor = 'white',
+  spinnerColor = 'var(--heading-color)',
   spinnerSize = 100,
   emptyTitle,
   emptyDescription,

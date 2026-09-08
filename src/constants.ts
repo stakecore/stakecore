@@ -45,7 +45,9 @@ export const avalancheDelegatorMinLockup = 1209600
 export const avalancheDelegatorMaxLockup = 31536000
 
 // style
-export const PAGE_COLOR_CODE = 'white'
+// Spinner ink. Every consumer is a spinners-react <SpinnerCircular color>,
+// which lands on the <svg> as a presentation attribute and resolves var().
+export const PAGE_COLOR_CODE = 'var(--heading-color)'
 
 
 // ---- Per-chain identity re-exports ----

@@ -11,13 +11,14 @@ const MAX_LEDS = 70
 const OPACITY_BEFORE = 0.25
 const OPACITY_AFTER = 1
 
-// Bespoke status palette for the meter LEDs. Each tier carries the flat
-// label colour + the radial gradient used to render the LED itself.
+// Each tier carries the flat label colour (a theme token — it is text, and
+// needs an AA light value) + the radial gradient used to render the LED
+// itself (literal — a fill that reads on either ground).
 type StatusPalette = { label: string, gradient: string }
 
-const STATUS_BAD:    StatusPalette = { label: '#d94357', gradient: 'radial-gradient(#d94357 25%, #a82234)' }
-const STATUS_MEDIUM: StatusPalette = { label: '#e58630', gradient: 'radial-gradient(#a05714 25%, #dd781c)' }
-const STATUS_GOOD:   StatusPalette = { label: '#76B768', gradient: 'radial-gradient(#487e3c 25%, #64ae55)' }
+const STATUS_BAD:    StatusPalette = { label: 'var(--status-bad)',  gradient: 'radial-gradient(#d94357 25%, #a82234)' }
+const STATUS_MEDIUM: StatusPalette = { label: 'var(--status-warn)', gradient: 'radial-gradient(#a05714 25%, #dd781c)' }
+const STATUS_GOOD:   StatusPalette = { label: 'var(--status-good)', gradient: 'radial-gradient(#487e3c 25%, #64ae55)' }
 const STATUS_PALETTE = [STATUS_BAD, STATUS_MEDIUM, STATUS_GOOD]
 
 // getColorIdx returns 0..ranges.length, and `ranges` is a 2-tuple against a

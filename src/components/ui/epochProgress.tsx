@@ -14,11 +14,11 @@ export type EpochPeriod = {
 type Props = {
   /** Compute the current period boundaries and metadata from a timestamp */
   period: (now: number) => EpochPeriod
-  /** Optional accent color for the fill (default: white) */
+  /** Optional accent color for the fill (default: the ink token) */
   color?: string
 }
 
-const EpochProgress = ({ period, color = "white" }: Props) => {
+const EpochProgress = ({ period, color = 'var(--heading-color)' }: Props) => {
   const [now, setNow] = useState(Date.now)
 
   useEffect(() => {

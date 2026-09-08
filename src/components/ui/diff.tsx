@@ -1,11 +1,12 @@
 import './diff.scss'
 
-// Bespoke data-viz colours for percent change (positive/negative).
-// Tied to this component; not part of the theme palette.
-const COLOR_POSITIVE = '#50e3c2'
-const COLOR_NEGATIVE = '#ff3e55'
-const BG_POSITIVE = 'rgba(80, 227, 194, 0.12)'
-const BG_NEGATIVE = 'rgba(255, 62, 85, 0.12)'
+// Percent-change colours. Tokens rather than literals so the light palette
+// can supply AA values (#50e3c2 on white is 1.7:1); the pill background is
+// the same token at 12%, which is what the old rgba literals were.
+const COLOR_POSITIVE = 'var(--diff-positive)'
+const COLOR_NEGATIVE = 'var(--diff-negative)'
+const BG_POSITIVE = 'color-mix(in srgb, var(--diff-positive) 12%, transparent)'
+const BG_NEGATIVE = 'color-mix(in srgb, var(--diff-negative) 12%, transparent)'
 
 export const Diff = ({ diff, unit = "", pill = false }) => {
   const neg = typeof diff === 'string' && diff.startsWith('-')
