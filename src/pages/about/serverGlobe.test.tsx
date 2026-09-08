@@ -3,6 +3,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, cleanup, fireEvent } from '@testing-library/react'
 import ServerGlobe, { NODES } from './serverGlobe'
+import { useThemeStore } from '~/features/theme/store'
 
 // happy-dom has no canvas backend and no layout engine, so three things
 // need standing in for:
@@ -192,5 +193,17 @@ describe('ServerGlobe', () => {
       fireEvent.pointerMove(canvas, { pointerId: 1, clientX: 240, clientY: 200 })
       expect(ctxCalls).not.toContain('arc')
     })
+  })
+
+  it('repaints when the theme flips, and reads the palette again', () => {
+    const readSpy = vi.spyOn(window, 'getComputedStyle')
+    render(<ServerGlobe />)
+    const drawsBefore = ctxCalls.filter(c => c === 'clearRect').length
+    const readsBefore = readSpy.mock.calls.length
+    useThemeStore.getState().toggleTheme()
+    expect(ctxCalls.filter(c => c === 'clearRect').length).toBe(drawsBefore + 1)
+    expect(readSpy.mock.calls.length).toBeGreaterThan(readsBefore)
+    useThemeStore.setState({ theme: 'dark', pinned: false })
+    readSpy.mockRestore()
   })
 })

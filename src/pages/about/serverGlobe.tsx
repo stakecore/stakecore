@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useThemeStore } from '~/features/theme/store'
 import { COASTLINE_RINGS } from './coastlines'
 import { project, graticule, dragRotation } from './globeProjection'
 import './serverGlobe.scss'
@@ -30,8 +31,8 @@ const RESUME_DELAY_MS = 2_500 // idle time after a drag before auto-spin returns
 const MAX_SIZE_PX = 420
 const GLOBE_RADIUS_RATIO = 0.42 // leaves room for halos at the limb
 
-// Fallbacks match --success / --heading-color in assets/css/style.css; the
-// live values are read from CSS at mount so the two stay in step.
+// Fallbacks match --success / --heading-color in assets/css/theme.css; the
+// live values are read from CSS at mount and again on every theme flip.
 const FALLBACK_SERVER_COLOR = '#7fb88f'
 const FALLBACK_CLIENT_COLOR = '#ffffff'
 
@@ -164,8 +165,9 @@ function drawRegions(
   centreLon: number,
   centreLat: number,
   nearFace: boolean,
+  clientColor: string,
 ) {
-  ctx.fillStyle = '#ffffff'
+  ctx.fillStyle = clientColor
   for (const region of PROVIDER_REGIONS) {
     const p = project(region.lon, region.lat, centreLon, centreLat, radius)
     if (p.visible !== nearFace) continue
@@ -244,34 +246,43 @@ function draw(
 
   ctx.clearRect(0, 0, size, size)
 
+  // Every structural stroke is the ink colour at a fixed alpha — the same
+  // values the rgba(255,255,255,α) literals carried, so the dark render is
+  // unchanged, and on the light palette the ink is black.
+  ctx.fillStyle = clientColor
+  ctx.strokeStyle = clientColor
+  ctx.lineWidth = 1
+
   // Sphere body — barely-there fill so the disc reads as a solid object
   // against the page rather than as a floating wireframe.
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.022)'
+  ctx.globalAlpha = 0.022
   ctx.beginPath()
   ctx.arc(cx, cy, radius, 0, Math.PI * 2)
   ctx.fill()
 
   // Far face first, so the near face paints over it.
-  ctx.lineWidth = 1
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)'
+  ctx.globalAlpha = 0.05
   strokeLines(ctx, GRATICULE_LINES, cx, cy, radius, centreLon, centreLat, false)
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)'
+  ctx.globalAlpha = 0.12
   strokeLines(ctx, COASTLINE_RINGS, cx, cy, radius, centreLon, centreLat, false)
-  drawRegions(ctx, cx, cy, radius, centreLon, centreLat, false)
+  ctx.globalAlpha = 1
+  drawRegions(ctx, cx, cy, radius, centreLon, centreLat, false, clientColor)
   drawNodes(ctx, cx, cy, radius, centreLon, centreLat, false, serverColor, clientColor)
 
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)'
+  ctx.strokeStyle = clientColor
+  ctx.globalAlpha = 0.08
   strokeLines(ctx, GRATICULE_LINES, cx, cy, radius, centreLon, centreLat, true)
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.34)'
+  ctx.globalAlpha = 0.34
   strokeLines(ctx, COASTLINE_RINGS, cx, cy, radius, centreLon, centreLat, true)
 
   // Limb, to close the silhouette.
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)'
+  ctx.globalAlpha = 0.14
   ctx.beginPath()
   ctx.arc(cx, cy, radius, 0, Math.PI * 2)
   ctx.stroke()
+  ctx.globalAlpha = 1
 
-  drawRegions(ctx, cx, cy, radius, centreLon, centreLat, true)
+  drawRegions(ctx, cx, cy, radius, centreLon, centreLat, true, clientColor)
   drawNodes(ctx, cx, cy, radius, centreLon, centreLat, true, serverColor, clientColor)
 }
 
@@ -284,9 +295,14 @@ const ServerGlobe = () => {
     const ctx = canvas.getContext('2d')
     if (ctx == null) return
 
-    const styles = getComputedStyle(canvas)
-    const serverColor = styles.getPropertyValue('--success').trim() || FALLBACK_SERVER_COLOR
-    const clientColor = styles.getPropertyValue('--heading-color').trim() || FALLBACK_CLIENT_COLOR
+    let serverColor = FALLBACK_SERVER_COLOR
+    let clientColor = FALLBACK_CLIENT_COLOR
+    const readColors = () => {
+      const styles = getComputedStyle(canvas)
+      serverColor = styles.getPropertyValue('--success').trim() || FALLBACK_SERVER_COLOR
+      clientColor = styles.getPropertyValue('--heading-color').trim() || FALLBACK_CLIENT_COLOR
+    }
+    readColors()
 
     const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false
 
@@ -392,10 +408,21 @@ const ServerGlobe = () => {
     canvas.addEventListener('pointerup', onPointerEnd)
     canvas.addEventListener('pointercancel', onPointerEnd)
 
+    // Re-read on a theme flip and repaint once; the running loop (if any)
+    // picks the new values up on its next frame anyway. Subscribing here
+    // rather than re-running the effect on `theme` keeps centreLon, so the
+    // globe does not snap back to the Atlantic when the button is pressed.
+    const unsubscribeTheme = useThemeStore.subscribe((state, prev) => {
+      if (state.theme === prev.theme) return
+      readColors()
+      if (size > 0) draw(ctx, size, centreLon, centreLat, serverColor, clientColor)
+    })
+
     if (!document.hidden) start()
     document.addEventListener('visibilitychange', onVisibility)
 
     return () => {
+      unsubscribeTheme()
       stop()
       if (resumeTimer != null) clearTimeout(resumeTimer)
       canvas.removeEventListener('pointerdown', onPointerDown)
