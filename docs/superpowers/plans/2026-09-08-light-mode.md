@@ -41,7 +41,9 @@ The regression check in Task 11 needs screenshots of today's dark render. The wo
 import { test, expect } from './fixtures/backend'
 import { ROUTES } from './fixtures/routes'
 
-test.use({ colorScheme: 'dark', reducedMotion: 'reduce', viewport: { width: 1400, height: 900 } })
+// reducedMotion is a context option, not a test option — under test.use it
+// must go through contextOptions or Playwright silently ignores it.
+test.use({ colorScheme: 'dark', contextOptions: { reducedMotion: 'reduce' }, viewport: { width: 1400, height: 900 } })
 
 for (const { path, heading } of ROUTES) {
   test(`dark baseline ${path}`, async ({ page }) => {
