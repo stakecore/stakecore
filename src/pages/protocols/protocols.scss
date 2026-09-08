@@ -183,7 +183,9 @@
 // Notification callout (note / warning / danger), used by the validator
 // delegate + description sections. Moved out of the global custom.css.
 .notification-block {
+    // Fallback then exact: 60% of the ink is #999 on the dark palette.
     border-left: 4px solid var(--main-color);
+    border-left-color: color-mix(in srgb, var(--heading-color) 60%, transparent);
     padding: 0.5rem 1rem;
     // Was rgba(0,0,0,.5): black over the black page. The raised surface is
     // the same on dark and reads as a faint panel on light instead of a
