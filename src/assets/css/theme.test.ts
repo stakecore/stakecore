@@ -38,9 +38,9 @@ describe('theme.css', () => {
     expect(d).toContain('--body-background: #000')
     expect(d).toContain('--border-emphasis: rgba(255, 255, 255, 0.45)')
     expect(d).toContain('--border-strong: rgba(255, 255, 255, 0.25)')
-    // toContain, not a stricter match — "--border:" is also a prefix of
-    // "--border-emphasis:" etc., so this needs the value alongside the name
-    // to disambiguate from its longer siblings.
+    // The colon already disambiguates "--border:" from "--border-emphasis:"
+    // etc., so toContain on the name alone would be safe — the value is
+    // included anyway because that is the actual thing being pinned here.
     expect(d).toContain('--border: rgba(255, 255, 255, 0.1)')
     expect(d).toContain('--border-subtle: rgba(255, 255, 255, 0.08)')
     expect(d).toContain('--border-faint: rgba(255, 255, 255, 0.06)')

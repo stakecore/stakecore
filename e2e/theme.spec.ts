@@ -5,10 +5,10 @@ import { THEME_KEY } from '../src/features/theme/types'
 const html = (page: import('@playwright/test').Page) => page.locator('html')
 const themeColor = (page: import('@playwright/test').Page) => page.locator('meta[name="theme-color"]')
 
-// playwright.config.ts defaults colorScheme to dark; these two override it
-// per block to prove first paint follows whichever the OS reports.
 const body = (page: import('@playwright/test').Page) => page.locator('body')
 
+// playwright.config.ts defaults colorScheme to dark; these two override it
+// per block to prove first paint follows whichever the OS reports.
 test.describe('with no saved preference', () => {
   test.describe('and a light OS', () => {
     test.use({ colorScheme: 'light' })

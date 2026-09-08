@@ -1,16 +1,36 @@
-// Colour for the recharts line chart's series stroke, dot fill/stroke and
-// axis tick fill — targeting recharts' own class names rather than passing
-// these as component props. `stroke` and `fill` are SVG *presentation
-// attributes*, and only Chromium is installed in this repo to check whether
-// var() resolves inside one; if it doesn't, the failure mode is hard
-// (stroke falls back to `none`, fill to `black` — invisible lines on a
-// black page). A stylesheet rule beats a presentation attribute in every
-// browser, which sidesteps the question entirely.
+// Colour for the recharts line chart's curve stroke and axis tick fill —
+// targeting recharts' own class names rather than passing these as
+// component props. `stroke` and `fill` are SVG *presentation attributes*,
+// and only Chromium is installed in this repo to check whether var()
+// resolves inside one; if it doesn't, the failure mode is hard (stroke
+// falls back to `none`, fill to `black` — invisible lines on a black page).
+// A stylesheet rule beats a presentation attribute in every browser, which
+// sidesteps the question entirely.
+//
+// The dots are NOT covered here, on purpose — they stay as props in
+// statsChart.tsx (INK / INK_DIM / GROUND). recharts renders each series'
+// curve into <g class="recharts-line"> inside a zIndex-400 layer, but its
+// dots are portaled by the Dots component into a *separate sibling* <g>
+// inside a zIndex-600 layer (see node_modules/recharts/lib/component/Dots.js
+// and lib/component/ZIndexLayer.js). A dot's real parent chain is
+// `.recharts-line-dots <- .recharts-zIndex-layer_600 <- .recharts-surface`,
+// which never nests under `.recharts-line` — so `.recharts-line
+// .recharts-line-dot` matches zero elements no matter how the selector is
+// written. Verified against a real render: with the rule that used to be
+// here, dots painted recharts' own defaults (white fill, #3182bd stroke)
+// instead of the tokens, and the same default leaked into activeDot too
+// (it takes its fill from Line's stroke prop). Don't try a cleverer
+// selector for this — the portal makes it structurally unreachable; the
+// stroke/dot props on <Line> are the actual mechanism, and this file only
+// covers what they can't.
 //
 // recharts renders one <g class="recharts-line"> per series, in the order
 // the <Line> elements are given — first series is the primary ink, every
 // later one (none of today's charts pass more than one key, but the
-// component supports it) falls back to the dimmer token.
+// component supports it) falls back to the dimmer token. This only holds
+// because those <g>s are currently the sole children of the zIndex-400
+// layer; adding a sibling with the same default zIndex (a ReferenceLine or
+// ErrorBar, for instance) would shift which child is :first-of-type.
 
 .recharts-cartesian-axis-tick-value {
     fill: var(--text-dim);
@@ -22,14 +42,4 @@
 
 .recharts-line:not(:first-of-type) .recharts-line-curve {
     stroke: var(--text-dim);
-}
-
-.recharts-line:first-of-type .recharts-line-dot {
-    stroke: var(--heading-color);
-    fill: var(--body-background);
-}
-
-.recharts-line:not(:first-of-type) .recharts-line-dot {
-    stroke: var(--text-dim);
-    fill: var(--body-background);
 }

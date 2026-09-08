@@ -188,8 +188,11 @@
     border-left-color: color-mix(in srgb, var(--heading-color) 60%, transparent);
     padding: 0.5rem 1rem;
     // Was rgba(0,0,0,.5): half the ground colour over the ground itself —
-    // exactly black on dark (same as the old literal), a soft veil on
-    // light. Fallback then exact, this branch's own pattern.
+    // exactly black on dark (same as the old literal). On light that's
+    // 50% white over white, i.e. invisible: only the left rail shows there,
+    // which is correct — the callout never needed a background on light,
+    // only on dark where it separated the panel from the black page.
+    // Fallback then exact, this branch's own pattern.
     background: var(--surface-raised);
     background: color-mix(in srgb, var(--body-background) 50%, transparent);
 }

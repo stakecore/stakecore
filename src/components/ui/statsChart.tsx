@@ -4,15 +4,19 @@ import './statsChart.scss'
 
 const chartMargin = { top: 20, right: 20, bottom: 5, left: 20 }
 
-// Theme tokens for the parts recharts renders as inline styles — var()
-// resolves fine there. The series stroke, dot fill/stroke and axis tick fill
-// are presentation *attributes* instead, where a failed var() resolution is
-// a hard failure (stroke -> none, fill -> black: invisible lines on a black
-// page), and only Chromium is installed here to check that it doesn't fail.
-// Those live in statsChart.scss as stylesheet rules instead, which resolve
-// var() the same in every browser.
+// Theme tokens. The tooltip styles below are inline styles, where var()
+// resolves fine everywhere. The curve stroke and axis tick fill are
+// presentation *attributes* instead — a failed var() resolution there is a
+// hard failure (stroke -> none, fill -> black: invisible lines on a black
+// page), and only Chromium is installed here to check that it doesn't fail
+// — so those two are left to statsChart.scss's stylesheet rules, which
+// resolve var() the same in every browser. The dot colours stay as props
+// (INK / INK_DIM / GROUND below): recharts portals Dots into a sibling
+// zIndex layer outside the line's own <g>, so no stylesheet selector can
+// reach them (see statsChart.scss's header comment for the full story).
 const INK = 'var(--heading-color)'
 const INK_DIM = 'var(--text-dim)'
+const GROUND = 'var(--body-background)'
 const TOOLTIP = { background: 'var(--surface-menu)', border: '1px solid var(--border)', borderRadius: 8 }
 
 // Generic reward-epoch line chart shared by the FSP and validator statistics
@@ -49,17 +53,23 @@ const StatsChart = ({ data, keys, formatY, height = 200 }: {
         itemStyle={{ color: INK }}
         formatter={(v: number) => formatY(v)}
       />
-      {/* stroke and dot fill/stroke left to statsChart.scss's
-          .recharts-line rules, targeting the first series vs. the rest by
-          DOM order (recharts renders one <g class="recharts-line"> per
-          series, in prop order). */}
-      {keys.map(key => (
+      {/* stroke is belt-and-braces here: statsChart.scss's
+          .recharts-line-curve rules win wherever CSS can reach the curve, so
+          this attribute is the fallback for a browser where it can't. dot's
+          fill/stroke has no CSS equivalent at all — recharts portals dots
+          into a sibling zIndex layer outside the line's own <g>, so they are
+          not reachable by a descendant selector on .recharts-line (see
+          statsChart.scss). activeDot inherits its fill from this stroke too
+          (recharts' ActivePoints), so leaving it off here would recolour the
+          hover/keyboard dot along with the resting ones. */}
+      {keys.map((key, i) => (
         <Line
           key={key}
           type="monotone"
           dataKey={key}
+          stroke={i === 0 ? INK : INK_DIM}
           strokeWidth={2}
-          dot={{ strokeWidth: 2, r: 4 }}
+          dot={{ fill: GROUND, stroke: i === 0 ? INK : INK_DIM, strokeWidth: 2, r: 4 }}
           activeDot={{ r: 6 }}
           name={key}
         />

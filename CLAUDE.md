@@ -200,13 +200,17 @@ oklch lightness clamp (a floor on dark, a ceiling on light).
   `fill`, `color`) was verified in Chromium, but only Chromium is installed
   here, so nothing depends on it where the failure mode is invisible content.
   `statsChart.scss` targets recharts' own class names
-  (`.recharts-line-curve`, `.recharts-line-dot`,
-  `.recharts-cartesian-axis-tick-value`) instead of passing colours through
-  `<Line>` / `<XAxis>` props, and `diff.tsx`'s arrow icon takes
-  `fill="currentColor"` rather than the token directly. Where the value lands
-  in an inline style or a custom property instead — spinners-react's `color`
-  prop, the chart tooltip's `contentStyle` / `labelStyle` / `itemStyle` —
-  `var()` is universally safe and stays a prop.
+  (`.recharts-line-curve`, `.recharts-cartesian-axis-tick-value`) for the
+  curve stroke and axis tick fill, instead of passing those through `<Line>`
+  / `<XAxis>` props, and `diff.tsx`'s arrow icon takes `fill="currentColor"`
+  rather than the token directly. The chart's **dots** stay on `<Line>`'s
+  `stroke`/`dot` props on purpose — recharts portals `Dots` into a sibling
+  zIndex layer outside the line's own `<g>` (`statsChart.scss`'s header
+  comment has the detail), so no `.recharts-line …` selector can reach them;
+  a CSS rule there would silently match nothing. Where the value lands in an
+  inline style or a custom property instead — spinners-react's `color` prop,
+  the chart tooltip's `contentStyle` / `labelStyle` / `itemStyle` — `var()`
+  is universally safe and stays a prop.
 - **Playwright emulates a light OS by default**, so `playwright.config.ts`
   sets `colorScheme: 'dark'` and theme-aware specs opt in. `a11y.spec.ts`
   scans every page state under both palettes (pinned through storage with
