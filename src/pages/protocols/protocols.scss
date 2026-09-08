@@ -187,12 +187,16 @@
     border-left: 4px solid var(--main-color);
     border-left-color: color-mix(in srgb, var(--heading-color) 60%, transparent);
     padding: 0.5rem 1rem;
-    // Was rgba(0,0,0,.5): black over the black page. The raised surface is
-    // the same on dark and reads as a faint panel on light instead of a
-    // half-black box.
+    // Was rgba(0,0,0,.5): half the ground colour over the ground itself —
+    // exactly black on dark (same as the old literal), a soft veil on
+    // light. Fallback then exact, this branch's own pattern.
     background: var(--surface-raised);
+    background: color-mix(in srgb, var(--body-background) 50%, transparent);
 }
 
-.notification-block.note { border-color: lime; }
-.notification-block.warning { border-color: orange; }
-.notification-block.danger { border-color: red; }
+// These carry AA-contrast border values per palette, which the named
+// colours they replaced did not: orange measured 1.98:1 on white and lime
+// 1.37:1, both well under the 3:1 UI-component minimum.
+.notification-block.note { border-color: var(--status-good); }
+.notification-block.warning { border-color: var(--status-warn); }
+.notification-block.danger { border-color: var(--danger); }
