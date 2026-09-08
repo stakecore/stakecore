@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import profile from '../../assets/images/about/profile.svg'
+import { useThemeStore } from '~/features/theme/store'
 
 
 // GPU implementation of the ASCII-wave hero background. A single
@@ -18,10 +19,11 @@ void main() {
   gl_Position = vec4(a_position, 0.0, 1.0);
 }`
 
-// Fragment shader. The wave is purely f(dist, phase); the rune mask
-// is a tiny texture that decides per-cell whether to tint white or
-// gray; the glyph atlas is a 10-wide horizontal strip of pre-rendered
-// RAMP characters in white, multiplied by the per-cell color.
+// Fragment shader. The wave is purely f(dist, phase); the rune mask is a
+// tiny texture that decides per-cell whether a glyph is full strength or
+// dimmed; the glyph atlas is a 10-wide horizontal strip of pre-rendered RAMP
+// characters. Output is premultiplied ink × alpha on a transparent canvas —
+// the page shows through where there is no glyph, whichever theme it is.
 const FRAGMENT_SHADER = `#version 300 es
 precision highp float;
 
@@ -31,12 +33,13 @@ uniform float u_cellSizePx;     // backing-store pixels per cell
 uniform vec2  u_runeSizeCells;  // (runeW, runeH) in cells
 uniform sampler2D u_glyphAtlas; // horizontal strip, RAMP_LEN glyphs
 uniform sampler2D u_runeMask;   // rune silhouette texture
+uniform vec3  u_ink;            // glyph colour — the --heading-color token
 
 out vec4 fragColor;
 
 const float RAMP_LEN = 10.0;
-const float INSIDE_COLOR = 1.0;       // white
-const float OUTSIDE_COLOR = 0.42;     // ~#6B6B6B
+const float INSIDE_ALPHA = 1.0;       // full-strength glyphs inside the rune
+const float OUTSIDE_ALPHA = 0.42;     // dimmed field outside it
 const float INSIDE_THRESHOLD = 0.05;
 
 void main() {
@@ -73,12 +76,26 @@ void main() {
   vec2 atlasUV = vec2((charIdx + cellLocal.x) / RAMP_LEN, cellLocal.y);
 
   float glyphAlpha = texture(u_glyphAtlas, atlasUV).a;
-  float color = isInside ? INSIDE_COLOR : OUTSIDE_COLOR;
+  float a = glyphAlpha * (isInside ? INSIDE_ALPHA : OUTSIDE_ALPHA);
 
-  // Canvas is opaque (alpha:false context); CSS opacity + gradient
-  // mask handle compositing into the page.
-  fragColor = vec4(vec3(color * glyphAlpha), 1.0);
+  // Premultiplied, to match the context's premultipliedAlpha:true. CSS
+  // opacity + the gradient mask still handle compositing into the page.
+  fragColor = vec4(u_ink * a, a);
 }`
+
+// Any CSS colour → linear-ish 0..1 RGB, via the 2D canvas parser so the token
+// may be hex, rgb() or a named colour without a parser of our own.
+const parseCssColor = (color: string): [number, number, number] => {
+  const off = document.createElement('canvas')
+  off.width = 1
+  off.height = 1
+  const ctx = off.getContext('2d')
+  if (!ctx) return [1, 1, 1]
+  ctx.fillStyle = color
+  ctx.fillRect(0, 0, 1, 1)
+  const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data
+  return [(r ?? 255) / 255, (g ?? 255) / 255, (b ?? 255) / 255]
+}
 
 const HeroRuneCanvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -86,7 +103,7 @@ const HeroRuneCanvas = () => {
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const gl = canvas.getContext('webgl2', { antialias: false, alpha: false, premultipliedAlpha: false })
+    const gl = canvas.getContext('webgl2', { antialias: false, alpha: true, premultipliedAlpha: true })
     if (!gl) {
       console.warn('hero-rune: WebGL2 unavailable; background will not render')
       return
@@ -155,6 +172,15 @@ const HeroRuneCanvas = () => {
     gl.uniform1i(gl.getUniformLocation(program, 'u_glyphAtlas'), 0)
     gl.uniform1i(gl.getUniformLocation(program, 'u_runeMask'), 1)
     if (uCellSize) gl.uniform1f(uCellSize, cellSizePx)
+
+    const uInk = gl.getUniformLocation(program, 'u_ink')
+    const applyInk = () => {
+      const css = getComputedStyle(canvas).getPropertyValue('--heading-color').trim() || '#fff'
+      const [r, g, b] = parseCssColor(css)
+      gl.useProgram(program)
+      if (uInk) gl.uniform3f(uInk, r, g, b)
+    }
+    applyInk()
 
     // --- glyph atlas: a 1-row horizontal strip of all RAMP chars
     // rendered in white. The fragment shader multiplies by per-cell
@@ -322,6 +348,16 @@ const HeroRuneCanvas = () => {
       raf = 0
     }
 
+    // The store stamps data-theme before it notifies, so the computed style
+    // read in applyInk is already the incoming palette. When the RAF loop is
+    // idle (reduced motion, off-screen, hidden tab) nothing else would
+    // repaint, so draw one frame here.
+    const unsubscribeTheme = useThemeStore.subscribe((state, prev) => {
+      if (destroyed || state.theme === prev.theme) return
+      applyInk()
+      if (ready && raf === 0) drawFrame()
+    })
+
     setup()
     rasterize().then(() => {
       if (destroyed) return
@@ -363,6 +399,7 @@ const HeroRuneCanvas = () => {
 
     return () => {
       destroyed = true
+      unsubscribeTheme()
       io.disconnect()
       document.removeEventListener('visibilitychange', onVisibility)
       stopLoop()
