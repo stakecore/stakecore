@@ -196,6 +196,12 @@ oklch lightness clamp (a floor on dark, a ceiling on light).
   routes at 2% tolerance against a pre-change build; the spec was deleted
   afterwards, so that pass is not a standing gate — the pinned literals in
   `theme.test.ts` are what CI actually checks going forward.
+  One set of dark values did move, deliberately: `.notification-block`'s
+  `.note` / `.warning` / `.danger` borders were the named colours `lime` /
+  `orange` / `red` and are now `--status-good` / `--status-warn` / `--danger`,
+  so on dark the warning rail shifts `#ffa500` → `#e58630`. The named colours
+  could not stay: `orange` measures 1.98:1 on white and `lime` 1.37:1, and the
+  warning callout renders on both validator routes.
 - **`var(--…)` resolving inside SVG presentation attributes** (`stroke`,
   `fill`, `color`) was verified in Chromium, but only Chromium is installed
   here, so nothing depends on it where the failure mode is invisible content.
