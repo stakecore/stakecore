@@ -77,7 +77,10 @@
     font-weight: t.$weight-regular;
     line-height: 1.4;
     margin: 0;
-    color: var(--main-color);
+    // Not --main-color: this is the one body-text element sitting on top of
+    // the rune canvas, so its contrast is set by how strong the art is. The
+    // token carries --main-color's value on dark and a darker one on light.
+    color: var(--hero-tagline-color);
     max-width: 540px;
 }
 

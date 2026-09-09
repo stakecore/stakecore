@@ -50,6 +50,13 @@
     --diff-positive: #50e3c2;                      /* percent-change pill */
     --diff-negative: #ff3e55;
 
+    /* The hero tagline sits on top of the rune canvas, so it is the one piece
+       of body text whose contrast is set by how strong the art is rather than
+       by the page background. Its own token for that reason: the light
+       palette darkens it to buy the art room to be visible, and dark keeps
+       exactly what --main-color gave it. */
+    --hero-tagline-color: #9f9f9f;
+
     /* Formula inputs, not colours. The carousel hover clamps a brand mark's
        oklch lightness to this (a floor on dark, a ceiling on light); the
        chain symbol behind page headers renders at this opacity; the hero
@@ -87,8 +94,16 @@
     --status-good: #3a7d3c;          /* 5.0:1 */
     --diff-positive: #0f766e;        /* 5.5:1 */
     --diff-negative: #c8102e;        /* 5.9:1 */
+    --hero-tagline-color: #333;      /* 5.19:1 over the art below, 12.6:1 on bare white */
 
     --brand-lightness-clamp: 0.55;
     --chain-art-opacity: 0.30;
-    --hero-art-opacity: 0.15;   /* pixel-sampled: .hero-tagline over the rune canvas, 4.74:1 */
+    /* The tagline and the art compete for the same pixels: every step darker
+       here eats the tagline's contrast, which is why --hero-tagline-color
+       exists. Pixel-sampled at this pair — darkest canvas pixel 166, tagline
+       5.19:1 over it, and the whole hero's worst element 4.78:1 (the
+       ServerError panel, which is still --main-color and sits over a lighter
+       part of the field). The old 0.15 with --main-color measured 4.74:1, so
+       this is more contrast AND more visible art. Re-sample if either moves. */
+    --hero-art-opacity: 0.35;
 }

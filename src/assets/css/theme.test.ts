@@ -50,5 +50,9 @@ describe('theme.css', () => {
     expect(d).toContain('--text-dim: rgba(255, 255, 255, 0.55)')
     expect(d).toContain('--danger: #ff3e55')
     expect(d).toContain('--success: #7fb88f')
+    // Not a token that moved out of style.css, but pinned for the same
+    // reason: the hero tagline was --main-color, and it only became its own
+    // token so the LIGHT palette could darken it. Dark must stay put.
+    expect(d).toContain('--hero-tagline-color: #9f9f9f')
   })
 })

@@ -225,12 +225,17 @@ oklch lightness clamp (a floor on dark, a ceiling on light).
 - **Contrast over the art, re-measured.** The dark figure recorded above
   (6.04:1, `.page-header-sup` over the Flare symbol) still holds — re-sampling
   `.page-header-sup` over the chain symbols gave 7.93:1 dark and 6.63:1 light,
-  so the chain art was never the binding constraint. The rune canvas is: the
-  hero tagline over a fully-lit glyph measured **3.19:1** in light at the
-  inherited `opacity: 0.3`, so `--hero-art-opacity` now carries that value per
-  palette — dark keeps `0.3`, light drops to `0.15`, which measures
-  **4.74:1**. Re-run the sampler if either art's opacity or the tagline
-  colour changes.
+  so the chain art was never the binding constraint. The rune canvas is, and
+  it is the one place where readable text and visible art pull against each
+  other: every step darker in `--hero-art-opacity` eats the hero tagline's
+  contrast, because the tagline sits on top of the canvas. They are therefore
+  tuned as a **pair**, and the light values are `--hero-art-opacity: 0.35`
+  with `--hero-tagline-color: #333`, measuring **5.19:1** for the tagline over
+  the darkest canvas pixel and **4.78:1** for the hero's worst element (the
+  `ServerError` panel, still `--main-color`). Dark keeps `0.3` and `#9f9f9f`,
+  i.e. exactly what `--main-color` gave it. Changing either light value alone
+  breaks the pair — re-sample both, and every text element in the hero, not
+  just the tagline.
 - **A pre-existing dark-mode gap the sampling exposed.** The same hero tagline
   over the same canvas measures **3.24:1 in dark**, and always has —
   `--main-color` (`#9f9f9f`) over the canvas's bright inside glyphs. It was
