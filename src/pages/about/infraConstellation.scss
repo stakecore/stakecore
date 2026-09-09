@@ -26,9 +26,17 @@
 // --- Connection lines ---
 
 .infra-line {
-    stroke: var(--border);
-    stroke: color-mix(in srgb, var(--heading-color) 18%, transparent);
-    stroke-width: 1;
+    // 55% at 1.5px, up from 18% at 1px: the original measured 1.53:1 on light
+    // and 1.55:1 on dark — invisible on both, which is why this moved in BOTH
+    // palettes rather than light alone. 55% reads 4.74:1 / 6.25:1.
+    // The width matters as much as the alpha here: with a 3-on/9-off dash
+    // only a quarter of the line's length is inked, so at 1px it still read
+    // as a row of specks at ratios that nominally cleared the 3:1 WCAG asks
+    // of a meaningful graphic. The dash rhythm itself is deliberate (see
+    // below) and stayed as it was.
+    stroke: var(--text-dim);
+    stroke: color-mix(in srgb, var(--heading-color) 55%, transparent);
+    stroke-width: 1.5;
     fill: none;
     // Dashes moving from server end (x1, y1) toward workload (x2, y2)
     // — read as control plane / heartbeat traffic.
@@ -61,7 +69,7 @@
 // and takes over.
 
 .infra-workload {
-    opacity: 0.2;
+    opacity: var(--infra-spare-opacity);
     transition: opacity 400ms ease-out;
 }
 

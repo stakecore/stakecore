@@ -57,5 +57,10 @@ describe('theme.css', () => {
     // Was the literal fill on all four protocol thumbnail SVGs before they
     // were inlined; pinned so the dark tiles stay exactly as they rendered.
     expect(d).toContain('--thumb-surface: #0a0a0a')
+    // Were literals in infraConstellation.tsx's TYPE_COLORS before they became
+    // per-palette; pinned so the dark constellation keeps its exact accents.
+    expect(d).toContain('--infra-flare: #e0639d')
+    expect(d).toContain('--infra-songbird: #6dc1e8')
+    expect(d).toContain('--infra-avalanche: #e84142')
   })
 })

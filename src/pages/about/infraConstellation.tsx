@@ -28,12 +28,17 @@ const VIEW = 600
 const C = VIEW / 2
 const ORBIT_R = 210
 
-// Chain → workload colour. Mapped to the chains' visual brand
-// identity: Flare pink, Songbird sky blue, Avalanche red.
+// Chain → workload colour: Flare pink, Songbird sky blue, Avalanche red.
+// Tokens rather than literals because these are not the networks' brand hexes
+// — they are lightened variants picked to read on black, and on white the
+// Songbird blue fell to 2.01:1. theme.css carries a darkened light value for
+// each; dark keeps exactly what was here. These land in an inline `style`,
+// where var() is universally supported (unlike an SVG presentation attribute
+// — see statsChart.scss for where that distinction bit).
 const TYPE_COLORS = [
-  '#e0639d',  // 0 — Flare (pink)
-  '#6dc1e8',  // 1 — Songbird (light blue)
-  '#e84142',  // 2 — Avalanche (red)
+  'var(--infra-flare)',      // 0 — Flare (pink)
+  'var(--infra-songbird)',   // 1 — Songbird (light blue)
+  'var(--infra-avalanche)',  // 2 — Avalanche (red)
 ]
 const N_TYPES = TYPE_COLORS.length
 const INSTANCES_PER_TYPE = 4

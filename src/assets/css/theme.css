@@ -62,6 +62,18 @@
        wants to sit slightly apart from the page on either palette. */
     --thumb-surface: #0a0a0a;
 
+    /* Chain accents for the infrastructure constellation
+       (about/infraConstellation.tsx). Not the networks' brand hexes — these
+       are lightened variants art-directed for a black ground, which is why
+       they need a per-palette value at all: on white the Songbird blue fell
+       to 2.01:1. --infra-spare-opacity dims the hot-spare nodes, and wants a
+       higher value on light, where 0.2 of a colour over white is nearly
+       nothing. */
+    --infra-flare: #e0639d;
+    --infra-songbird: #6dc1e8;
+    --infra-avalanche: #e84142;
+    --infra-spare-opacity: 0.2;
+
     /* Formula inputs, not colours. The carousel hover clamps a brand mark's
        oklch lightness to this (a floor on dark, a ceiling on light); the
        chain symbol behind page headers renders at this opacity; the hero
@@ -101,6 +113,10 @@
     --diff-negative: #c8102e;        /* 5.9:1 */
     --hero-tagline-color: #262626;   /* over the art below; 14.9:1 on bare white */
     --thumb-surface: #f2f2f2;
+    --infra-flare: #d6337f;          /* 4.53:1 */
+    --infra-songbird: #1b7eac;       /* 4.54:1 */
+    --infra-avalanche: #e52728;      /* 4.51:1 */
+    --infra-spare-opacity: 0.35;
 
     --brand-lightness-clamp: 0.55;
     --chain-art-opacity: 0.30;
