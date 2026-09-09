@@ -79,11 +79,11 @@
 }
 
 .server-globe-legend-term--server::before {
-    background: var(--success);
+    background: var(--globe-server);
 }
 
 .server-globe-legend-term--worker::before {
-    background: var(--heading-color);
+    background: var(--globe-worker);
 }
 
 // Matches how the regions draw on the globe: same white, much dimmer, and

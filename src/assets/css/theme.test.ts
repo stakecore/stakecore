@@ -62,5 +62,8 @@ describe('theme.css', () => {
     expect(d).toContain('--infra-flare: #e0639d')
     expect(d).toContain('--infra-songbird: #6dc1e8')
     expect(d).toContain('--infra-avalanche: #e84142')
+    // The globe's server dots were --success; pinned so splitting them off
+    // into their own token did not move the dark render.
+    expect(d).toContain('--globe-server: #7fb88f')
   })
 })

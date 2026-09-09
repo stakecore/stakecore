@@ -74,6 +74,14 @@
     --infra-avalanche: #e84142;
     --infra-spare-opacity: 0.2;
 
+    /* Server globe node dots (about/serverGlobe.tsx) and the swatches in its
+       legend. Its own pair rather than --success / --heading-color: the green
+       is not a status here, and the workers were painting in pure ink, which
+       read as stark next to the sage servers. Both are pastel on dark and
+       deepen on light, where a pastel would have nothing to hold against. */
+    --globe-server: #7fb88f;
+    --globe-worker: #93b7d4;
+
     /* Formula inputs, not colours. The carousel hover clamps a brand mark's
        oklch lightness to this (a floor on dark, a ceiling on light); the
        chain symbol behind page headers renders at this opacity; the hero
@@ -117,6 +125,8 @@
     --infra-songbird: #1b7eac;       /* 4.54:1 */
     --infra-avalanche: #e52728;      /* 4.51:1 */
     --infra-spare-opacity: 0.35;
+    --globe-server: #2f7d4a;         /* 5.06:1 */
+    --globe-worker: #3a6c93;         /* 5.61:1 */
 
     --brand-lightness-clamp: 0.55;
     --chain-art-opacity: 0.30;

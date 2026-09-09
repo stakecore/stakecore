@@ -31,10 +31,17 @@ const RESUME_DELAY_MS = 2_500 // idle time after a drag before auto-spin returns
 const MAX_SIZE_PX = 420
 const GLOBE_RADIUS_RATIO = 0.42 // leaves room for halos at the limb
 
-// Fallbacks match --success / --heading-color in assets/css/theme.css; the
-// live values are read from CSS at mount and again on every theme flip.
+// Fallbacks match --globe-server / --globe-worker / --heading-color in
+// assets/css/theme.css; the live values are read from CSS at mount and again
+// on every theme flip.
+//
+// The node dots and the structure are deliberately three colours, not two:
+// the workers used to paint in pure ink, which is what made them read as
+// stark white pinpricks next to the sage servers. They have their own token
+// now, and `ink` is left to the sphere, graticule, coastlines and regions.
 const FALLBACK_SERVER_COLOR = '#7fb88f'
-const FALLBACK_CLIENT_COLOR = '#ffffff'
+const FALLBACK_WORKER_COLOR = '#93b7d4'
+const FALLBACK_INK_COLOR = '#ffffff'
 
 const GRATICULE_LINES = graticule()
 
@@ -165,9 +172,9 @@ function drawRegions(
   centreLon: number,
   centreLat: number,
   nearFace: boolean,
-  clientColor: string,
+  ink: string,
 ) {
-  ctx.fillStyle = clientColor
+  ctx.fillStyle = ink
   for (const region of PROVIDER_REGIONS) {
     const p = project(region.lon, region.lat, centreLon, centreLat, radius)
     if (p.visible !== nearFace) continue
@@ -200,7 +207,7 @@ function drawNodes(
   centreLat: number,
   nearFace: boolean,
   serverColor: string,
-  clientColor: string,
+  workerColor: string,
 ) {
   for (const node of NODES) {
     const p = project(node.lon, node.lat, centreLon, centreLat, radius)
@@ -209,7 +216,7 @@ function drawNodes(
     const x = cx + p.x
     const y = cy + p.y
     const isServer = node.role === 'server'
-    const color = isServer ? serverColor : clientColor
+    const color = isServer ? serverColor : workerColor
 
     // Far-side nodes are drawn dimmer and slightly smaller so they read as
     // sitting behind the sphere — but not so dim they vanish. For roughly a
@@ -238,7 +245,8 @@ function draw(
   centreLon: number,
   centreLat: number,
   serverColor: string,
-  clientColor: string,
+  workerColor: string,
+  ink: string,
 ) {
   const cx = size / 2
   const cy = size / 2
@@ -249,8 +257,8 @@ function draw(
   // Every structural stroke is the ink colour at a fixed alpha — the same
   // values the rgba(255,255,255,α) literals carried, so the dark render is
   // unchanged, and on the light palette the ink is black.
-  ctx.fillStyle = clientColor
-  ctx.strokeStyle = clientColor
+  ctx.fillStyle = ink
+  ctx.strokeStyle = ink
   ctx.lineWidth = 1
 
   // Sphere body — barely-there fill so the disc reads as a solid object
@@ -266,14 +274,14 @@ function draw(
   ctx.globalAlpha = 0.12
   strokeLines(ctx, COASTLINE_RINGS, cx, cy, radius, centreLon, centreLat, false)
   ctx.globalAlpha = 1
-  drawRegions(ctx, cx, cy, radius, centreLon, centreLat, false, clientColor)
-  drawNodes(ctx, cx, cy, radius, centreLon, centreLat, false, serverColor, clientColor)
+  drawRegions(ctx, cx, cy, radius, centreLon, centreLat, false, ink)
+  drawNodes(ctx, cx, cy, radius, centreLon, centreLat, false, serverColor, workerColor)
 
   // Neither drawRegions nor drawNodes touches strokeStyle today, so this
   // re-set is currently redundant with the one above — it guards against a
   // future edit to either function changing strokeStyle (e.g. to draw node
   // outlines in serverColor) and silently bleeding into the strokes below.
-  ctx.strokeStyle = clientColor
+  ctx.strokeStyle = ink
   ctx.globalAlpha = 0.08
   strokeLines(ctx, GRATICULE_LINES, cx, cy, radius, centreLon, centreLat, true)
   ctx.globalAlpha = 0.34
@@ -286,8 +294,8 @@ function draw(
   ctx.stroke()
   ctx.globalAlpha = 1
 
-  drawRegions(ctx, cx, cy, radius, centreLon, centreLat, true, clientColor)
-  drawNodes(ctx, cx, cy, radius, centreLon, centreLat, true, serverColor, clientColor)
+  drawRegions(ctx, cx, cy, radius, centreLon, centreLat, true, ink)
+  drawNodes(ctx, cx, cy, radius, centreLon, centreLat, true, serverColor, workerColor)
 }
 
 const ServerGlobe = () => {
@@ -300,11 +308,13 @@ const ServerGlobe = () => {
     if (ctx == null) return
 
     let serverColor = FALLBACK_SERVER_COLOR
-    let clientColor = FALLBACK_CLIENT_COLOR
+    let workerColor = FALLBACK_WORKER_COLOR
+    let ink = FALLBACK_INK_COLOR
     const readColors = () => {
       const styles = getComputedStyle(canvas)
-      serverColor = styles.getPropertyValue('--success').trim() || FALLBACK_SERVER_COLOR
-      clientColor = styles.getPropertyValue('--heading-color').trim() || FALLBACK_CLIENT_COLOR
+      serverColor = styles.getPropertyValue('--globe-server').trim() || FALLBACK_SERVER_COLOR
+      workerColor = styles.getPropertyValue('--globe-worker').trim() || FALLBACK_WORKER_COLOR
+      ink = styles.getPropertyValue('--heading-color').trim() || FALLBACK_INK_COLOR
     }
     readColors()
 
@@ -326,7 +336,7 @@ const ServerGlobe = () => {
       canvas.style.width = `${size}px`
       canvas.style.height = `${size}px`
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      draw(ctx, size, centreLon, centreLat, serverColor, clientColor)
+      draw(ctx, size, centreLon, centreLat, serverColor, workerColor, ink)
     }
 
     resize()
@@ -348,7 +358,7 @@ const ServerGlobe = () => {
         centreLon = (centreLon + ((now - lastTime) / ROTATION_PERIOD_MS) * 360) % 360
       }
       lastTime = now
-      if (size > 0) draw(ctx, size, centreLon, centreLat, serverColor, clientColor)
+      if (size > 0) draw(ctx, size, centreLon, centreLat, serverColor, workerColor, ink)
       frame = requestAnimationFrame(tick)
     }
 
@@ -397,7 +407,7 @@ const ServerGlobe = () => {
       lastY = e.clientY
       centreLon = next.lon
       centreLat = next.lat
-      draw(ctx, size, centreLon, centreLat, serverColor, clientColor)
+      draw(ctx, size, centreLon, centreLat, serverColor, workerColor, ink)
     }
 
     const onPointerEnd = (e: PointerEvent) => {
@@ -419,7 +429,7 @@ const ServerGlobe = () => {
     const unsubscribeTheme = useThemeStore.subscribe((state, prev) => {
       if (state.theme === prev.theme) return
       readColors()
-      if (size > 0) draw(ctx, size, centreLon, centreLat, serverColor, clientColor)
+      if (size > 0) draw(ctx, size, centreLon, centreLat, serverColor, workerColor, ink)
     })
 
     if (!document.hidden) start()
