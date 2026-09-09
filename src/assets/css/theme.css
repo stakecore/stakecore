@@ -69,7 +69,7 @@
 :root[data-theme="light"] {
     color-scheme: light;
 
-    --main-color: #5c5c5c;        /* 6.7:1 */
+    --main-color: #575757;        /* 7.0:1 on white; also sits over the hero art — see --hero-art-opacity */
     --heading-color: #000;
     --body-background: #fff;
 
@@ -94,16 +94,18 @@
     --status-good: #3a7d3c;          /* 5.0:1 */
     --diff-positive: #0f766e;        /* 5.5:1 */
     --diff-negative: #c8102e;        /* 5.9:1 */
-    --hero-tagline-color: #333;      /* 5.19:1 over the art below, 12.6:1 on bare white */
+    --hero-tagline-color: #262626;   /* over the art below; 14.9:1 on bare white */
 
     --brand-lightness-clamp: 0.55;
     --chain-art-opacity: 0.30;
-    /* The tagline and the art compete for the same pixels: every step darker
-       here eats the tagline's contrast, which is why --hero-tagline-color
-       exists. Pixel-sampled at this pair — darkest canvas pixel 166, tagline
-       5.19:1 over it, and the whole hero's worst element 4.78:1 (the
-       ServerError panel, which is still --main-color and sits over a lighter
-       part of the field). The old 0.15 with --main-color measured 4.74:1, so
-       this is more contrast AND more visible art. Re-sample if either moves. */
-    --hero-art-opacity: 0.35;
+    /* The art and the hero's text compete for the same pixels: every step
+       darker here eats the contrast of everything sitting on the canvas — the
+       tagline (--hero-tagline-color) and the statistics (--main-color). All
+       three are tuned as a set, pixel-sampled against the LOADED hero (the
+       statistics, not the error panel), worst of three animation frames:
+       tagline 4.99:1, statistics 4.78:1, wordmark 14.59:1.
+       0.45 was measured too and reached 4.56:1 — clearing AA, but too thin a
+       margin on a background whose worst pixel moves every frame. Re-sample
+       all three, and every text element in the hero, if any of them moves. */
+    --hero-art-opacity: 0.42;
 }

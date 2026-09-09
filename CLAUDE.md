@@ -227,15 +227,22 @@ oklch lightness clamp (a floor on dark, a ceiling on light).
   `.page-header-sup` over the chain symbols gave 7.93:1 dark and 6.63:1 light,
   so the chain art was never the binding constraint. The rune canvas is, and
   it is the one place where readable text and visible art pull against each
-  other: every step darker in `--hero-art-opacity` eats the hero tagline's
-  contrast, because the tagline sits on top of the canvas. They are therefore
-  tuned as a **pair**, and the light values are `--hero-art-opacity: 0.35`
-  with `--hero-tagline-color: #333`, measuring **5.19:1** for the tagline over
-  the darkest canvas pixel and **4.78:1** for the hero's worst element (the
-  `ServerError` panel, still `--main-color`). Dark keeps `0.3` and `#9f9f9f`,
-  i.e. exactly what `--main-color` gave it. Changing either light value alone
-  breaks the pair — re-sample both, and every text element in the hero, not
-  just the tagline.
+  other: every step darker in `--hero-art-opacity` eats the contrast of every
+  piece of text sitting on the canvas. Three light values are therefore tuned
+  as a **set** — `--hero-art-opacity: 0.42`, `--hero-tagline-color: #262626`,
+  and `--main-color: #575757` (the statistics) — measuring **4.99:1** for the
+  tagline, **4.78:1** for the statistics and 14.59:1 for the wordmark, worst
+  of three animation frames. Dark keeps `0.3` and `#9f9f9f`, i.e. exactly what
+  `--main-color` gave it. Changing one light value alone breaks the set:
+  re-sample all three and every text element in the hero.
+  Two traps if you re-run the sampler. Measure the **loaded** hero, not the
+  `ServerError` state — the statistics are the text that is normally there,
+  and they sit over a different part of the field. And the sampler takes the
+  worst pixel in an element's *bounding box*, so it reports the activity
+  marquee's links at ~1:1 whenever a token logo drifts inside their box; that
+  is the box, not the text's background. `0.45` was measured too and reached
+  4.56:1 — passing, but too thin a margin on art whose worst pixel moves every
+  frame.
 - **A pre-existing dark-mode gap the sampling exposed.** The same hero tagline
   over the same canvas measures **3.24:1 in dark**, and always has —
   `--main-color` (`#9f9f9f`) over the canvas's bright inside glyphs. It was
