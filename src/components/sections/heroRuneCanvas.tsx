@@ -11,7 +11,15 @@ import { useThemeStore } from '~/features/theme/store'
 //
 // Per-frame main-thread work reduces to: update one `u_phase` uniform
 // + drawArrays(6). All shading happens on the GPU in parallel.
-const RAMP = ' .,:;+*x#@'
+// Density ramp, faintest first. Deliberately has no leading space: the wave
+// is a function of radial distance, so every cell whose value fell in the
+// ramp's first slot rendered the same character at the same radius — and when
+// that character was a blank, the result was a clean empty ring through the
+// field, once per wave period. '.' keeps the trough faint without punching a
+// hole in it. The shader's RAMP_LEN is interpolated from this string's length
+// rather than restated, since the atlas builder below sizes itself the same
+// way and the two must agree.
+const RAMP = '.,:;+*x#@'
 const SVG_ASPECT = 340 / 380
 
 const VERTEX_SHADER = `#version 300 es
@@ -22,9 +30,10 @@ void main() {
 
 // Fragment shader. The wave is purely f(dist, phase); the rune mask is a
 // tiny texture that decides per-cell whether a glyph is full strength or
-// dimmed; the glyph atlas is a 10-wide horizontal strip of pre-rendered RAMP
-// characters. Output is premultiplied ink × alpha on a transparent canvas —
-// the page shows through where there is no glyph, whichever theme it is.
+// dimmed; the glyph atlas is a horizontal strip of the pre-rendered RAMP
+// characters, one cell wide each. Output is premultiplied ink × alpha on a
+// transparent canvas — the page shows through between the glyph strokes,
+// whichever theme it is.
 const FRAGMENT_SHADER = `#version 300 es
 precision highp float;
 
@@ -38,7 +47,7 @@ uniform vec3  u_ink;            // glyph colour — the --heading-color token
 
 out vec4 fragColor;
 
-const float RAMP_LEN = 10.0;
+const float RAMP_LEN = ${RAMP.length}.0;
 const float INSIDE_ALPHA = 1.0;       // full-strength glyphs inside the rune
 const float OUTSIDE_ALPHA = 0.42;     // dimmed field outside it
 const float INSIDE_THRESHOLD = 0.05;
