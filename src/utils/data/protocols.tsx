@@ -1,36 +1,40 @@
-import avalancheValidatorThumbnail from "../../assets/images/protocols/avalanche/validator/thumbnail.svg"
-import flareValidatorThumbnail from "../../assets/images/protocols/flare/validator/thumbnail.svg"
-import flareFspThumbnail from "../../assets/images/protocols/flare/fsp/thumbnail.svg"
-import songbirdFspThumbnail from "../../assets/images/protocols/songbird/fsp/thumbnail.svg"
+import {
+    AvalancheValidatorThumbnail,
+    FlareFspThumbnail,
+    FlareValidatorThumbnail,
+    SongbirdFspThumbnail,
+} from "~/components/ui/protocolThumbnails"
 
-// 1920 x 1249
+// `Thumbnail` is a component, not a URL: these illustrations are drawn from
+// the theme tokens so one drawing serves both palettes, which an <img src>
+// could not do. See protocolThumbnails.tsx.
 export const protocolsData = [
     {
         id: 1,
         category: "Flare",
         title: "Validator",
         href: '/flare/validator',
-        src: flareValidatorThumbnail
+        Thumbnail: FlareValidatorThumbnail
     },
     {
         id: 2,
         category: "Flare",
         title: "FSP",
         href: '/flare/fsp',
-        src: flareFspThumbnail
+        Thumbnail: FlareFspThumbnail
     },
     {
         id: 3,
         category: "Songbird",
         title: "FSP",
         href: "/songbird/fsp",
-        src: songbirdFspThumbnail
+        Thumbnail: SongbirdFspThumbnail
     },
     {
         id: 4,
         category: "Avalanche",
         title: "Validator",
         href: '/avalanche/validator',
-        src: avalancheValidatorThumbnail
+        Thumbnail: AvalancheValidatorThumbnail
     }
 ]

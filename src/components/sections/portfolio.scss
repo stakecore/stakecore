@@ -68,12 +68,9 @@
     overflow: hidden;
     background: var(--surface-raised);
 
-    img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: block;
-    }
+    // The thumbnails are inline <svg> now (protocolThumbnails.tsx), and their
+    // own rule sizes them; preserveAspectRatio="xMidYMid slice" gives what
+    // object-fit: cover gave the <img>.
 }
 
 .protocols-tile-content {

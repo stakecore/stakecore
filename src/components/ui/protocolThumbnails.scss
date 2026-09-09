@@ -1,0 +1,62 @@
+// Colour for the protocol tile illustrations (protocolThumbnails.tsx).
+//
+// The alphas here are the ones the .svg files carried as literal
+// rgba(255,255,255,a): 0.06 and 0.08 for the two rings, 0.2 for the star,
+// 0.4 for the ticks, 0.65 for the nodes. color-mix against --heading-color
+// reproduces each exactly on dark (the token is #fff there) and mirrors it to
+// black on light, so the dark tiles are unchanged and the light ones are the
+// same drawing the other way up.
+//
+// Each rule declares a plain token first and the color-mix second: the token
+// is the fallback for engines without color-mix (pre-2023), where it is the
+// nearest available alpha rather than the exact one. Same pattern as the rest
+// of the theme -- don't collapse the pairs into the token alone.
+
+.protocol-thumb {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.protocol-thumb-bg {
+    fill: var(--thumb-surface);
+}
+
+// FSP dial ring (0.08).
+.protocol-thumb-ring {
+    fill: none;
+    stroke: var(--border-subtle);
+    stroke: color-mix(in srgb, var(--heading-color) 8%, transparent);
+    stroke-width: 1;
+}
+
+// Validator ring (0.06).
+.protocol-thumb-ring-faint {
+    fill: none;
+    stroke: var(--border-faint);
+    stroke: color-mix(in srgb, var(--heading-color) 6%, transparent);
+    stroke-width: 1;
+}
+
+// FSP ticks (0.4).
+.protocol-thumb-ticks {
+    stroke: var(--border-emphasis);
+    stroke: color-mix(in srgb, var(--heading-color) 40%, transparent);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+}
+
+// Validator star (0.2).
+.protocol-thumb-web {
+    fill: none;
+    stroke: var(--border-strong);
+    stroke: color-mix(in srgb, var(--heading-color) 20%, transparent);
+    stroke-width: 1.2;
+    stroke-linejoin: round;
+}
+
+// Validator vertices (0.65).
+.protocol-thumb-nodes {
+    fill: var(--text-dim);
+    fill: color-mix(in srgb, var(--heading-color) 65%, transparent);
+}

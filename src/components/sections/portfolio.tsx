@@ -41,10 +41,10 @@ const Portfolio = () => {
                 </ul>
 
                 <div className="protocols-grid">
-                    {filteredProjects.map(({ id, category, title, href, src }) => (
+                    {filteredProjects.map(({ id, category, title, href, Thumbnail }) => (
                         <Link key={id} to={href} className="protocols-tile">
                             <div className="protocols-tile-image">
-                                <img src={src} alt="" />
+                                <Thumbnail />
                             </div>
                             <div className="protocols-tile-content">
                                 <span className="protocols-tile-category">{category}</span>

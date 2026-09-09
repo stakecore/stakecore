@@ -54,5 +54,8 @@ describe('theme.css', () => {
     // reason: the hero tagline was --main-color, and it only became its own
     // token so the LIGHT palette could darken it. Dark must stay put.
     expect(d).toContain('--hero-tagline-color: #9f9f9f')
+    // Was the literal fill on all four protocol thumbnail SVGs before they
+    // were inlined; pinned so the dark tiles stay exactly as they rendered.
+    expect(d).toContain('--thumb-surface: #0a0a0a')
   })
 })

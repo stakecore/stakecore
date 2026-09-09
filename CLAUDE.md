@@ -257,11 +257,22 @@ oklch lightness clamp (a floor on dark, a ceiling on light).
   `headless: false` (SwiftShader), and assert
   `document.createElement('canvas').getContext('webgl2')` is truthy before
   trusting the result.
-- Left as they are, deliberately: the five dark-canvas illustrations
-  (protocol thumbnails, the news visualiser) and the chain symbols — dark
-  cards on a light page, revisit after living with it; the `FireBrick` bar
-  fills, which read on both grounds and whose token neighbours differ in
-  value.
+- **The four protocol thumbnails are inline SVG components**, not `.svg`
+  files: [protocolThumbnails.tsx](src/components/ui/protocolThumbnails.tsx)
+  with its own stylesheet. As `<img src>` their colours were beyond CSS's
+  reach, which is the whole reason a drawing has to be inlined to be themed —
+  a second set of light `.svg` files would have been the same geometry to keep
+  in step twice. Their ground is `--thumb-surface` (dark `#0a0a0a`, the
+  literal the files carried) and every line is
+  `color-mix(in srgb, var(--heading-color) N%, transparent)` at the alpha the
+  file used, so dark is unchanged and light is the same drawing inverted.
+  Inlining also revealed there are only **two** drawings: both FSP tiles share
+  a ring and 24 ticks, both validator tiles a star and 10 nodes — only the
+  brand mark differs. Brand marks keep their own hex.
+- Left as they are, deliberately: the news FAsset visualiser (a much larger
+  drawing — still a dark card on a light page) and the chain symbols; the
+  `FireBrick` bar fills, which read on both grounds and whose token
+  neighbours differ in value.
 
 ### Agent readability
 

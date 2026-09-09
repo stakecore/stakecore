@@ -57,6 +57,11 @@
        exactly what --main-color gave it. */
     --hero-tagline-color: #9f9f9f;
 
+    /* Card behind the protocol tile illustrations (protocolThumbnails.tsx).
+       Its own token because it is a drawing's ground, not a UI surface: it
+       wants to sit slightly apart from the page on either palette. */
+    --thumb-surface: #0a0a0a;
+
     /* Formula inputs, not colours. The carousel hover clamps a brand mark's
        oklch lightness to this (a floor on dark, a ceiling on light); the
        chain symbol behind page headers renders at this opacity; the hero
@@ -95,6 +100,7 @@
     --diff-positive: #0f766e;        /* 5.5:1 */
     --diff-negative: #c8102e;        /* 5.9:1 */
     --hero-tagline-color: #262626;   /* over the art below; 14.9:1 on bare white */
+    --thumb-surface: #f2f2f2;
 
     --brand-lightness-clamp: 0.55;
     --chain-art-opacity: 0.30;
