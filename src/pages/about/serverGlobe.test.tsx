@@ -203,7 +203,7 @@ describe('ServerGlobe', () => {
     useThemeStore.getState().toggleTheme()
     expect(ctxCalls.filter(c => c === 'clearRect').length).toBe(drawsBefore + 1)
     expect(readSpy.mock.calls.length).toBeGreaterThan(readsBefore)
-    useThemeStore.setState({ theme: 'dark', pinned: false })
+    useThemeStore.setState({ theme: 'dark' })
     readSpy.mockRestore()
   })
 })

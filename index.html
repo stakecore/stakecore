@@ -6,20 +6,20 @@
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#000000" />
-  <!-- Theme, before first paint. Reads the saved choice, else the OS
-       preference, else dark, and stamps <html data-theme> so theme.css picks
-       the palette before the first frame — a module can't do this, it loads
-       too late. The storage key and the resolution order are the theme
-       store's (src/features/theme); prepaint.test.ts keeps them in step.
-       This is the one sanctioned touch of localStorage outside safeStorage.ts,
-       and each access is in its own try for the same reasons that file gives. -->
+  <!-- Theme, before first paint. Reads the saved choice, else dark, and
+       stamps <html data-theme> so theme.css picks the palette before the
+       first frame — a module can't do this, it loads too late.
+       prefers-color-scheme is deliberately not consulted: dark is the
+       default for everyone who has not pressed the toggle. The storage key
+       and the resolution order are the theme store's (src/features/theme);
+       prepaint.test.ts keeps them in step. This is the one sanctioned touch
+       of localStorage outside safeStorage.ts, and the access is in a try for
+       the same reasons that file gives. -->
   <script>
     (function () {
       var t
       try { t = localStorage.getItem('stakecore:theme') } catch (e) {}
-      if (t !== 'light' && t !== 'dark') {
-        try { t = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark' } catch (e) { t = 'dark' }
-      }
+      if (t !== 'light' && t !== 'dark') t = 'dark'
       document.documentElement.dataset.theme = t
       var m = document.querySelector('meta[name="theme-color"]')
       if (m) m.setAttribute('content', t === 'light' ? '#ffffff' : '#000000')

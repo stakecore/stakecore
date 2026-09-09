@@ -45,10 +45,10 @@ describe('index.html pre-paint script', () => {
     expect(document.querySelector('meta[name="theme-color"]')?.getAttribute('content')).toBe('#ffffff')
   })
 
-  it('follows a light OS when nothing is stored', () => {
+  it('ignores a light OS — dark is the default', () => {
     stubMatchMedia(true)
     runPrepaint()
-    expect(document.documentElement.dataset.theme).toBe('light')
+    expect(document.documentElement.dataset.theme).toBe('dark')
   })
 
   it('defaults to dark', () => {
@@ -63,7 +63,7 @@ describe('index.html pre-paint script', () => {
     expect(document.documentElement.dataset.theme).toBe('dark')
   })
 
-  it('survives blocked storage and a missing matchMedia', () => {
+  it('survives blocked storage', () => {
     const real = Object.getOwnPropertyDescriptor(window, 'localStorage')
     Object.defineProperty(window, 'localStorage', {
       configurable: true,

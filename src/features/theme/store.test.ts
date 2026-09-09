@@ -7,23 +7,18 @@ import { THEME_KEY } from './types'
 // case below loads a fresh copy after arranging storage and the OS query.
 const loadStore = async () => (await import('./store')).useThemeStore
 
-type Listener = (e: { matches: boolean }) => void
+// The store no longer consults matchMedia at all. The stub stays so a
+// regression that reintroduces an OS read is *observable* — `osPrefersLight`
+// is set to true in one test precisely to prove the answer is ignored.
 let osPrefersLight = false
-let mediaListeners: Listener[] = []
 
 const stubMatchMedia = () => {
-  mediaListeners = []
   vi.stubGlobal('matchMedia', (query: string) => ({
     matches: query === '(prefers-color-scheme: light)' && osPrefersLight,
     media: query,
-    addEventListener: (_: string, cb: Listener) => { mediaListeners.push(cb) },
+    addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
   }))
-}
-
-const fireOsChange = (light: boolean) => {
-  osPrefersLight = light
-  for (const cb of mediaListeners) cb({ matches: light })
 }
 
 // Same technique as safeStorage.test.ts: a throwing getter on the property,
@@ -57,49 +52,51 @@ afterEach(() => {
 })
 
 describe('initial theme', () => {
-  it('uses a stored choice over the OS preference, and is pinned', async () => {
+  it('uses a stored choice', async () => {
     localStorage.setItem(THEME_KEY, 'light')
     const store = await loadStore()
-    expect(store.getState()).toMatchObject({ theme: 'light', pinned: true })
+    expect(store.getState().theme).toBe('light')
   })
 
-  it('follows a light OS when nothing is stored, unpinned', async () => {
+  it('defaults to dark with nothing stored', async () => {
+    const store = await loadStore()
+    expect(store.getState().theme).toBe('dark')
+  })
+
+  it('still defaults to dark when the OS asks for light', async () => {
+    // The point of the change that removed OS-following: a light system does
+    // not get a light site until its owner presses the toggle.
     osPrefersLight = true
     const store = await loadStore()
-    expect(store.getState()).toMatchObject({ theme: 'light', pinned: false })
-  })
-
-  it('defaults to dark when the OS has no light preference', async () => {
-    const store = await loadStore()
-    expect(store.getState()).toMatchObject({ theme: 'dark', pinned: false })
+    expect(store.getState().theme).toBe('dark')
   })
 
   it('ignores a stored value that is not a theme', async () => {
     localStorage.setItem(THEME_KEY, 'blue')
-    osPrefersLight = true
     const store = await loadStore()
-    expect(store.getState()).toMatchObject({ theme: 'light', pinned: false })
+    expect(store.getState().theme).toBe('dark')
   })
 
-  it('falls through to the OS preference when storage is blocked', async () => {
+  it('defaults to dark when storage is blocked', async () => {
     blockStorage()
-    osPrefersLight = true
     const store = await loadStore()
-    expect(store.getState()).toMatchObject({ theme: 'light', pinned: false })
+    expect(store.getState().theme).toBe('dark')
   })
 
-  it('defaults to dark when matchMedia is unavailable', async () => {
-    vi.stubGlobal('matchMedia', undefined)
+  it('does not touch matchMedia at all', async () => {
+    // Guards the removal itself: a reintroduced OS read would throw here
+    // rather than silently start following the system again.
+    vi.stubGlobal('matchMedia', () => { throw new Error('matchMedia must not be consulted') })
     const store = await loadStore()
     expect(store.getState().theme).toBe('dark')
   })
 })
 
 describe('toggleTheme', () => {
-  it('flips the theme, pins it, stamps the document and persists', async () => {
+  it('flips the theme, stamps the document and persists', async () => {
     const store = await loadStore()
     store.getState().toggleTheme()
-    expect(store.getState()).toMatchObject({ theme: 'light', pinned: true })
+    expect(store.getState().theme).toBe('light')
     expect(document.documentElement.dataset.theme).toBe('light')
     expect(meta()).toBe('#ffffff')
     expect(localStorage.getItem(THEME_KEY)).toBe('light')
@@ -134,24 +131,5 @@ describe('toggleTheme', () => {
     store.subscribe(() => { seen = document.documentElement.dataset.theme })
     store.getState().toggleTheme()
     expect(seen).toBe('light')
-  })
-})
-
-describe('following the OS', () => {
-  it('tracks OS changes while unpinned', async () => {
-    const store = await loadStore()
-    fireOsChange(true)
-    expect(store.getState().theme).toBe('light')
-    expect(document.documentElement.dataset.theme).toBe('light')
-    fireOsChange(false)
-    expect(store.getState().theme).toBe('dark')
-  })
-
-  it('stops tracking once pinned by a click', async () => {
-    const store = await loadStore()
-    store.getState().toggleTheme()            // dark → light, pinned
-    fireOsChange(false)                       // OS says dark
-    expect(store.getState().theme).toBe('light')
-    expect(document.documentElement.dataset.theme).toBe('light')
   })
 })

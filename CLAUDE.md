@@ -172,10 +172,21 @@ blocks declare the same names and pins the dark values that moved out of
 *formula* has to flip rather than a value — today only the stack carousel's
 oklch lightness clamp (a floor on dark, a ceiling on light).
 
-- **Resolution order is stored choice → `prefers-color-scheme` → dark**, and
-  it is implemented twice on purpose: once in the inline pre-paint script in
-  `index.html` (it has to run before any module loads, or the first frame is
-  the wrong palette) and once in `src/features/theme/store.ts`.
+- **Resolution order is stored choice → dark, and `prefers-color-scheme` is
+  deliberately not consulted.** Dark is the default for every visitor who has
+  not pressed the toggle, whatever their system reports; only a saved choice
+  moves the site off it. That is a reversal of how this shipped — it followed
+  the OS at first — and removing the OS read took the store's `pinned` flag
+  and its module-scope `matchMedia` listener with it, since both existed only
+  to stop following the system once a choice had been made. Don't reintroduce
+  an OS read without also restoring that machinery: a store that follows the
+  OS but cannot be pinned would overwrite the visitor's choice on the next
+  system change. `store.test.ts` sets a light OS and asserts the answer is
+  still dark, and stubs `matchMedia` to throw so a reintroduced read fails
+  loudly rather than silently changing behaviour.
+  The order is implemented twice on purpose: once in the inline pre-paint
+  script in `index.html` (it has to run before any module loads, or the first
+  frame is the wrong palette) and once in `src/features/theme/store.ts`.
   `prepaint.test.ts` executes the script out of the HTML against happy-dom to
   keep the two in step. The script is the one sanctioned touch of
   `localStorage` outside `safeStorage.ts`.
@@ -217,11 +228,13 @@ oklch lightness clamp (a floor on dark, a ceiling on light).
   inline style or a custom property instead — spinners-react's `color` prop,
   the chart tooltip's `contentStyle` / `labelStyle` / `itemStyle` — `var()`
   is universally safe and stays a prop.
-- **Playwright emulates a light OS by default**, so `playwright.config.ts`
-  sets `colorScheme: 'dark'` and theme-aware specs opt in. `a11y.spec.ts`
-  scans every page state under both palettes (pinned through storage with
-  `e2e/fixtures/theme.ts`, so the pre-paint script applies it on the first
-  frame) and asserts `data-theme` before each route scan.
+- **Theme in e2e comes from storage, never from the emulated OS.**
+  `playwright.config.ts` sets no `colorScheme`: it used to pin `'dark'` only
+  because Playwright emulates a light OS and the app followed it, and that
+  reason is gone. `theme.spec.ts` emulates both systems and asserts each is
+  ignored. `a11y.spec.ts` scans every page state under both palettes, pinned
+  through storage with `e2e/fixtures/theme.ts` so the pre-paint script applies
+  it on the first frame, and asserts `data-theme` before each route scan.
 - **Contrast over the art, re-measured.** The dark figure recorded above
   (6.04:1, `.page-header-sup` over the Flare symbol) still holds — re-sampling
   `.page-header-sup` over the chain symbols gave 7.93:1 dark and 6.63:1 light,

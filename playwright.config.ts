@@ -18,11 +18,6 @@ export default defineConfig({
     baseURL: BASE_URL,
     // @vitejs/plugin-basic-ssl serves preview over a self-signed cert.
     ignoreHTTPSErrors: true,
-    // Playwright emulates prefers-color-scheme: light unless told otherwise,
-    // and the app now follows that on first visit. Dark here keeps every
-    // spec that doesn't care about theme seeing what it saw before; the
-    // theme-aware specs (theme.spec.ts, a11y.spec.ts) opt in per test.
-    colorScheme: 'dark',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },

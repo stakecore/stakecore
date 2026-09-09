@@ -167,7 +167,7 @@ describe('Header — protocols submenu is a disclosure', () => {
 describe('Header — theme toggle', () => {
   beforeEach(() => {
     localStorage.clear()
-    useThemeStore.setState({ theme: 'dark', pinned: false })
+    useThemeStore.setState({ theme: 'dark' })
     document.documentElement.dataset.theme = 'dark'
   })
 
@@ -186,7 +186,7 @@ describe('Header — theme toggle', () => {
     await user.click(screen.getAllByRole('button', { name: 'Switch to light theme' })[0]!)
     expect(screen.getAllByRole('button', { name: 'Switch to dark theme' })).toHaveLength(2)
     expect(document.documentElement.dataset.theme).toBe('light')
-    expect(useThemeStore.getState()).toMatchObject({ theme: 'light', pinned: true })
+    expect(useThemeStore.getState().theme).toBe('light')
   })
 
   it('is a real button, not a link', () => {
