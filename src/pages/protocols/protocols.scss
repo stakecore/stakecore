@@ -95,6 +95,23 @@
     align-items: baseline;
 }
 
+// A range that carries a unit states it on both bounds, so it gets a third
+// column and the figures right-align into the second. Folded into the figure
+// cell instead, a 3-digit max against the fixed 2-digit min ("14" / "149")
+// pushed "days" a digit out of line on one row — and the alignment is the
+// whole reason these rows are stacked rather than run together.
+.single-info-range--united {
+    grid-template-columns: auto auto 1fr;
+
+    .single-info-figure { text-align: right; }
+}
+
+// The unit is a word, and a two-word one ("reward epochs") would otherwise be
+// free to break across the row it names.
+.single-info-unit {
+    white-space: nowrap;
+}
+
 // The group pairs a bound name with its figure. It stops forming a box of its
 // own here so that both of its children become grid items of the range above
 // and land in that grid's two columns; it stays in the markup as the thing

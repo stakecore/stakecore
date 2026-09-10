@@ -14,8 +14,9 @@ import type { ISummary } from './types'
 //
 // The delegation range carries no unit at all: the Asset row two rows above it
 // names the token, so repeating it was the clutter. Lockup keeps one, because
-// nothing else on the card says "days" — and it appears once, on the Max row,
-// at the end of the range rather than on each bound.
+// nothing else on the card says "days" — and on a stack it repeats on both
+// bounds. Trailing only the max read as though the unit belonged to that one
+// figure; the rows are separate facts, so each states its own unit.
 
 const summaryOf = (o: Partial<ISummary> = {}): ISummary => ({
   asset: 'FLR',
@@ -50,10 +51,10 @@ describe('summary card ranges', () => {
     expect(textOf(valueUnder('Delegation'))).toBe('Min 25.0 Max 93.0')
   })
 
-  it('carries a unit the card does not imply once, at the end of the range', () => {
+  it('repeats a unit the card does not imply on both bounds', () => {
     renderInfo()
 
-    expect(textOf(valueUnder('Lockup'))).toBe('Min 14 Max 149 days')
+    expect(textOf(valueUnder('Lockup'))).toBe('Min 14 days Max 149 days')
   })
 
   it('marks up the bound names so they can be de-emphasised', () => {
@@ -74,11 +75,26 @@ describe('summary card ranges', () => {
     expect([...figures].map(f => textOf(f))).toEqual(['25.0', '93.0'])
   })
 
-  it('keeps the unit with the figure it trails, not in the bound column', () => {
+  it('gives the unit a column of its own, out of the figures', () => {
     renderInfo()
 
-    const figures = valueUnder('Lockup').querySelectorAll('.single-info-figure')
-    expect([...figures].map(f => textOf(f))).toEqual(['14', '149 days'])
+    // Not folded into the figure: with the unit in the same cell, a 3-digit
+    // max against a 2-digit min pushes "days" a digit out of line, and the
+    // alignment is the whole reason these rows are stacked.
+    const lockup = valueUnder('Lockup')
+    expect([...lockup.querySelectorAll('.single-info-figure')].map(f => textOf(f)))
+      .toEqual(['14', '149'])
+    expect([...lockup.querySelectorAll('.single-info-unit')].map(u => textOf(u)))
+      .toEqual(['days', 'days'])
+  })
+
+  it('renders no unit element at all for a range that carries none', () => {
+    renderInfo()
+
+    const delegation = valueUnder('Delegation')
+    expect(delegation.querySelectorAll('.single-info-unit')).toHaveLength(0)
+    // The extra column is opt-in, so the two-column grid is untouched for it.
+    expect(delegation.querySelector('.single-info-range--united')).toBeNull()
   })
 
   it('keeps each bound grouped with its figure', () => {

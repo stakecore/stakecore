@@ -81,36 +81,48 @@ const SpecsRow = ({ title, value, tooltip }: { title: React.ReactNode, value: IS
   )
 }
 
+// One bound of a range: its name, its figure, and — when the range carries a
+// unit — that unit in a cell of its own.
+//
+// The whitespace nodes are real, not just grid gaps: a grid ignores
+// whitespace-only children for layout, but textContent keeps them, so the
+// accessible name stays "Min 14 days" rather than running the parts together.
+const SummaryBound = (
+  { name, figure, unit }: { name: string, figure: string, unit?: string },
+) => (
+  <span className="single-info-bound-group">
+    <span className="single-info-bound">{name}</span>
+    {' '}
+    <span className="single-info-figure">{figure}</span>
+    {unit && <>{' '}<span className="single-info-unit">{unit}</span></>}
+  </span>
+)
+
 // A summary value is plain text or a pair of bounds. The bounds are named
 // rather than joined with "to", because "25.0 to 93.0" left the reader to
 // work out that they were a min and a max, and they stack one per line rather
 // than sharing one — a single line wrapped mid-pair at the real width of this
 // column, and stacking also lets the two figures align under each other.
 //
-// A unit is optional and rides on the range as a whole, so it renders once, at
-// the end. Delegation sends none: the Asset row further up this same card
-// already names the token. Lockup sends 'days', which nothing else states.
+// A unit is optional and belongs to the range, so both bounds state it.
+// Trailing only the max ("Min 14" over "Max 92 days") read as though the unit
+// were part of that one figure — on a stack the rows are separate facts, and
+// each carries its own. Delegation sends no unit at all: the Asset row further
+// up this same card already names the token. Lockup sends 'days', which
+// nothing else on the card states.
 const SummaryValue = ({ value }: { value: ISummaryValue }) => {
   if (typeof value === 'string') return <>{value}</>
+  // The unit's column is opt-in: with `display: contents` on the groups, every
+  // group has to contribute the same number of grid items, or the second bound
+  // starts in whichever column the first one ran out in.
+  const className = value.unit
+    ? 'single-info-range single-info-range--united'
+    : 'single-info-range'
   return (
-    <span className="single-info-range">
-      <span className="single-info-bound-group">
-        <span className="single-info-bound">Min</span>
-        {' '}
-        <span className="single-info-figure">{value.min}</span>
-      </span>
-      {/* Real whitespace nodes, not just grid gaps: a grid ignores
-          whitespace-only children for layout, but textContent keeps them, so
-          the accessible name stays "Min 25.0 Max 93.0" rather than running
-          the bounds and their figures together. */}
+    <span className={className}>
+      <SummaryBound name="Min" figure={value.min} unit={value.unit} />
       {' '}
-      <span className="single-info-bound-group">
-        <span className="single-info-bound">Max</span>
-        {' '}
-        <span className="single-info-figure">
-          {value.max}{value.unit && ` ${value.unit}`}
-        </span>
-      </span>
+      <SummaryBound name="Max" figure={value.max} unit={value.unit} />
     </span>
   )
 }
