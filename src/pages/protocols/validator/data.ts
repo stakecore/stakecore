@@ -41,10 +41,14 @@ export function createValidatorDataAccess(chain: ValidatorChain, service: Valida
     return {
       asset,
       apy: Formatter.percent(data.apy),
+      // No `unit` on this one: the summary card renders an Asset row two rows
+      // above these figures, so the token is already stated and repeating it
+      // only widened the value. Lockup below is the contrasting case — the
+      // card says "days" nowhere else, so that range does carry its unit.
       delegation: checkRangeAvailable(
         data.minimumDelegated,
         data.validatorAvailableCapacity,
-        { min: minDelegated, max: maxDelegated, unit: asset },
+        { min: minDelegated, max: maxDelegated },
       ),
       lockup: checkRangeAvailable(14 * 86400, leftover, { min: '14', max: maxLockup, unit: 'days' }),
       expired: leftover <= 0,

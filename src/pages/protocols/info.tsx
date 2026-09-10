@@ -30,8 +30,8 @@ const ProjectInfoSummary = ({ asset, apy, delegation, lockup }) => {
     <>
       <ProjectSingleInfo title='Asset' value={asset} />
       <ProjectSingleInfo title='APY' value={apy} />
-      <ProjectSingleInfo title='Delegation Amount' value={delegation} />
-      <ProjectSingleInfo title='Lockup Time' value={lockup} />
+      <ProjectSingleInfo title='Delegation' value={delegation} />
+      <ProjectSingleInfo title='Lockup' value={lockup} />
     </>
   )
 }
@@ -83,24 +83,33 @@ const SpecsRow = ({ title, value, tooltip }: { title: React.ReactNode, value: IS
 
 // A summary value is plain text or a pair of bounds. The bounds are named
 // rather than joined with "to", because "25.0 to 93.0" left the reader to
-// work out that they were a min and a max — and the unit rides on the range
-// so it appears once, at the end, instead of being missing entirely (the
-// asset has its own row further up the same card).
+// work out that they were a min and a max, and they stack one per line rather
+// than sharing one — a single line wrapped mid-pair at the real width of this
+// column, and stacking also lets the two figures align under each other.
+//
+// A unit is optional and rides on the range as a whole, so it renders once, at
+// the end. Delegation sends none: the Asset row further up this same card
+// already names the token. Lockup sends 'days', which nothing else states.
 const SummaryValue = ({ value }: { value: ISummaryValue }) => {
   if (typeof value === 'string') return <>{value}</>
   return (
     <span className="single-info-range">
       <span className="single-info-bound-group">
-        <span className="single-info-bound">Min</span> {value.min}
+        <span className="single-info-bound">Min</span>
+        {' '}
+        <span className="single-info-figure">{value.min}</span>
       </span>
-      {/* A real whitespace node, not just a flex gap: flex ignores
-          whitespace-only children for layout, but textContent keeps it, so
-          the accessible name stays "Min 25.0 Max 93.0 FLR" rather than
-          running the two bounds together. */}
+      {/* Real whitespace nodes, not just grid gaps: a grid ignores
+          whitespace-only children for layout, but textContent keeps them, so
+          the accessible name stays "Min 25.0 Max 93.0" rather than running
+          the bounds and their figures together. */}
       {' '}
       <span className="single-info-bound-group">
-        <span className="single-info-bound">Max</span> {value.max}
-        {value.unit && ` ${value.unit}`}
+        <span className="single-info-bound">Max</span>
+        {' '}
+        <span className="single-info-figure">
+          {value.max}{value.unit && ` ${value.unit}`}
+        </span>
       </span>
     </span>
   )

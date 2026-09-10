@@ -36,7 +36,9 @@ describe('AvalancheValidatorDataAccess.getSummary', () => {
       minimumDelegated: 25,
       validatorAvailableCapacity: 1_000_000,
     }))
-    expect(out.delegation).toEqual({ min: '25.0', max: '1.00M', unit: 'AVAX' })
+    // Unitless: the card's Asset row carries the token, so the per-network
+    // distinction is pinned by the 'AVAX' assertion above rather than here.
+    expect(out.delegation).toEqual({ min: '25.0', max: '1.00M' })
   })
 
   it('still reports "Unavailable" lockup when leftover < 14 days', () => {

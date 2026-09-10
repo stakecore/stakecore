@@ -58,20 +58,23 @@ describe('createValidatorDataAccess epoch APYs', () => {
 
 // The summary's two bounded fields used to render as one opaque string
 // ("25.0 to 93.0"), which left the reader to infer that the numbers were a
-// min and a max, and left the unit off entirely — the asset lives in a
-// separate row of the same card. They are structured now, so info.tsx can
-// label the bounds; see ISummaryValue in ../types.
+// min and a max. They are structured now, so info.tsx can label the bounds;
+// see ISummaryValue in ../types.
 describe('createValidatorDataAccess summary bounds', () => {
   const RANGE_END = FIXED_NOW + 149 * 86400
 
-  it('reports the delegation bounds as a range carrying the asset symbol', async () => {
+  it('reports the delegation bounds as a range with no unit of its own', async () => {
     const access = createValidatorDataAccess(Chain.FLARE, serviceOf(infoOf({
       minimumDelegated: 25,
       validatorAvailableCapacity: 93,
     })))
     const [validator] = await access.getPageData()
 
-    expect(validator?.summary.delegation).toEqual({ min: '25.0', max: '93.0', unit: 'FLR' })
+    // No `unit`: the summary card's own Asset row names the token two rows
+    // above these figures, so repeating it here was the clutter that started
+    // this. Lockup below is the contrasting case — nothing else on the card
+    // says "days", so that range does carry a unit.
+    expect(validator?.summary.delegation).toEqual({ min: '25.0', max: '93.0' })
   })
 
   it('reports the lockup bounds in days, with the unit on the range not the number', async () => {

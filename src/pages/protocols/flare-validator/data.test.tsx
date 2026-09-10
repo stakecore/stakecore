@@ -40,7 +40,9 @@ describe('FlareValidatorDataAccess.getSummary', () => {
       minimumDelegated: 25,
       validatorAvailableCapacity: 1_000_000,
     }))
-    expect(out.delegation).toEqual({ min: '25.0', max: '1.00M', unit: 'FLR' })
+    // Unitless: the summary card's Asset row states the token, which the
+    // test above pins as 'FLR'.
+    expect(out.delegation).toEqual({ min: '25.0', max: '1.00M' })
   })
 
   it('reports delegation as "Unavailable" when the capacity is exhausted (min > available)', () => {

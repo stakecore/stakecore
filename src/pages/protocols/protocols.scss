@@ -70,26 +70,46 @@
 // have it overridden by this selector.
 .col-lg-9 .single-project-page-right { margin-top: 24px; }
 
-// Bound names on a ranged summary value ("Min 25.0 · Max 93.0 FLR"). They are
-// scaffolding rather than data, so they sit at the muted label colour and
-// below the number's size — the figures stay the thing the eye lands on.
-// Sized in em so both track the h3 they live in rather than needing their own
-// breakpoint ramp.
+// A ranged summary value ("Min 25.0" over "Max 93.0") is an aligned two-row
+// stack: the bound name in a narrow first column, its .single-info-figure in
+// the second. The figures inherit the h3's tabular-nums, so they line up
+// digit-for-digit down that second column.
+//
+// It used to be a single flex line, itself a fix for plain inline flow, where
+// "Min 50.0k Max 4.45M FLR" broke after "Max" at the real /flare/validator
+// width and stranded a figure a line away from the word naming it; flex items
+// at least forced any break to land between the bounds rather than inside one.
+//
+// The stack is not free, and the trade is worth stating. Measured on the built
+// page against live data, dropping the unit left "Min 50.0k Max 3.89M" fitting
+// on one line at both 1440 and 390, so this costs a real 28px per range (a
+// 24px line plus the row-gap) — 56px of card height. What it buys is that the
+// fit stops depending on the figures: a wider max, a longer unit or a bigger
+// base font cannot reintroduce the break, and the two figures gain a shared
+// left edge they never had on one line.
+.single-info-range {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: 10px;
+    row-gap: 4px;
+    align-items: baseline;
+}
+
+// The group pairs a bound name with its figure. It stops forming a box of its
+// own here so that both of its children become grid items of the range above
+// and land in that grid's two columns; it stays in the markup as the thing
+// tying the pair together in the tree.
+.single-info-bound-group {
+    display: contents;
+}
+
+// Bound names on a ranged summary value. They are scaffolding rather than
+// data, so they sit at the muted label colour and below the figure's size —
+// the figures stay the thing the eye lands on. Sized in em so both track the
+// h3 they live in rather than needing their own breakpoint ramp.
 .single-info-bound {
     font-size: 0.7em;
     color: var(--main-color);
-}
-
-// The bounds are flex items so that a value too wide for this column breaks
-// *between* them rather than mid-pair. In normal inline flow "Min 50.0k Max
-// 4.45M FLR" wrapped after "Max" at the real /flare/validator width, leaving
-// the number on the next line away from the word naming it — which defeats
-// the point of naming the bounds. As flex items the second bound moves to its
-// own line intact, and only wraps internally if it cannot fit even there.
-.single-info-range {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: 12px;
 }
 
 .single-info {
