@@ -282,10 +282,11 @@ oklch lightness clamp (a floor on dark, a ceiling on light).
   Inlining also revealed there are only **two** drawings: both FSP tiles share
   a ring and 24 ticks, both validator tiles a star and 10 nodes — only the
   brand mark differs. Brand marks keep their own hex.
-- Left as they are, deliberately: the news FAsset visualiser (a much larger
-  drawing — still a dark card on a light page) and the chain symbols; the
-  `FireBrick` bar fills, which read on both grounds and whose token
-  neighbours differ in value.
+- Left as they are, deliberately: the chain symbols, and the `FireBrick` bar
+  fills, which read on both grounds and whose token neighbours differ in
+  value. (The news FAsset visualiser thumbnail was the third of these — a
+  much larger drawing, still a dark card on a light page. Its post no longer
+  carries art, and the file is gone.)
 
 ### Agent readability
 

@@ -1,5 +1,3 @@
-import fassetVisualiserThumbnail from '~/assets/images/news/fasset-visualiser.svg'
-
 export type NewsCategory = 'Release' | 'Network' | 'Incident'
 
 export interface NewsLink {
@@ -54,7 +52,6 @@ export const newsData: NewsPost[] = [
         date: '2026-05-11',
         category: 'Release',
         title: 'FAsset 3D Visualiser',
-        thumbnail: fassetVisualiserThumbnail,
         body: "A live 3D view of Flare's FAsset protocol. Each agent backing FXRP is drawn as a tunnel whose width is its total backing capacity, split between minted backing and free capacity and coloured by the agent's status, with every mint and redeem travelling through it as it happens. Every figure in the scene is rendered live from protocol state, not from a snapshot. A second deployment runs the same view against the Coston2 test network.",
         links: [
             { href: 'https://fasset.stakecore.org' },
